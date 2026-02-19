@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roxy Store - Sosyal Medya Hizmetleri</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-main">ROXY</span>
+                        <span class="logo-sub">STORE</span>
+                    </div>
+                </div>
+                
+                <div class="nav-links">
+                    <a href="#home" class="nav-link active">Ana Sayfa</a>
+                    <a href="#services" class="nav-link">Hizmetler</a>
+                    <a href="#features" class="nav-link">Neden Biz?</a>
+                    <a href="#contact" class="nav-link">İletişim</a>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="btn-primary" onclick="window.location.href='auth.html'">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Giriş Yap
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg">
+            <div class="hero-gradient hero-gradient-1"></div>
+            <div class="hero-gradient hero-gradient-2"></div>
+            <div class="hero-grid"></div>
+        </div>
+        
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-heart"></i>
+                    <span>Telegram'dan Tanıdığınız Güvenilir Hizmet</span>
+                </div>
+                
+                <h1 class="hero-title">
+                    Sosyal Medya Büyüme<br>
+                    <span class="gradient-text">Artık Daha Kolay</span>
+                </h1>
+                
+                <p class="hero-description">
+                    Instagram, TikTok, YouTube ve daha fazlası için hızlı ve güvenilir 
+                    sosyal medya hizmetleri. Telegram'daki hizmetimizi web'e taşıdık.
+                </p>
+                
+                <div class="hero-buttons">
+                    <button class="btn-hero-primary" onclick="window.location.href='auth.html'">
+                        <span>Hemen Giriş Yap</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="btn-hero-outline" onclick="scrollToSection('services')">
+                        <i class="fas fa-list"></i>
+                        <span>Hizmetlere Göz At</span>
+                    </button>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>150+</h3>
+                            <p>Mutlu Müşteri</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>1,200+</h3>
+                            <p>Tamamlanan Sipariş</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>7/24</h3>
+                            <p>Destek Hizmeti</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">HİZMETLERİMİZ</span>
+                <h2 class="section-title">Neler Sunuyoruz?</h2>
+                <p class="section-description">
+                    En çok tercih edilen platformlar için hızlı ve güvenilir hizmetler
+                </p>
+            </div>
+            
+            <div class="services-grid">
+                <!-- Instagram -->
+                <div class="service-card">
+                    <div class="service-icon instagram">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                    <h3>Instagram</h3>
+                    <p>Takipçi, beğeni, görüntülenme ve daha fazlası</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Hızlı teslimat</li>
+                        <li><i class="fas fa-check"></i> Güvenilir işlem</li>
+                        <li><i class="fas fa-check"></i> Uygun fiyat</li>
+                    </ul>
+                    <button class="btn-service" onclick="window.location.href='auth.html'">
+                        Sipariş Ver
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- TikTok -->
+                <div class="service-card featured">
+                    <div class="featured-badge">
+                        <i class="fas fa-fire"></i>
+                        <span>Popüler</span>
+                    </div>
+                    <div class="service-icon tiktok">
+                        <i class="fab fa-tiktok"></i>
+                    </div>
+                    <h3>TikTok</h3>
+                    <p>Takipçi, beğeni, izlenme ve paylaşım</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Gerçek etkileşim</li>
+                        <li><i class="fas fa-check"></i> Anında başlama</li>
+                        <li><i class="fas fa-check"></i> Garanti hizmeti</li>
+                    </ul>
+                    <button class="btn-service" onclick="window.location.href='auth.html'">
+                        Sipariş Ver
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- YouTube -->
+                <div class="service-card">
+                    <div class="service-icon youtube">
+                        <i class="fab fa-youtube"></i>
+                    </div>
+                    <h3>YouTube</h3>
+                    <p>Abone, izlenme, beğeni ve yorum</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Kaliteli hizmet</li>
+                        <li><i class="fas fa-check"></i> Güvenli işlem</li>
+                        <li><i class="fas fa-check"></i> 7/24 destek</li>
+                    </ul>
+                    <button class="btn-service" onclick="window.location.href='auth.html'">
+                        Sipariş Ver
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Sanal Numara -->
+                <div class="service-card">
+                    <div class="service-icon phone">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Sanal Numara</h3>
+                    <p>SMS doğrulama için güvenilir numaralar</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Çeşitli ülkeler</li>
+                        <li><i class="fas fa-check"></i> Anında SMS</li>
+                        <li><i class="fas fa-check"></i> Uygun fiyat</li>
+                    </ul>
+                    <button class="btn-service" onclick="window.location.href='auth.html'">
+                        Sipariş Ver
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">NEDEN BİZ?</span>
+                <h2 class="section-title">Bizi Tercih Etme Nedenleri</h2>
+                <p class="section-description">
+                    Müşterilerimizin memnuniyeti bizim önceliğimiz
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Hızlı Teslimat</h3>
+                    <p>Siparişleriniz kısa sürede tamamlanır</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Güvenilir Hizmet</h3>
+                    <p>Hesap güvenliğiniz bizim için önemli</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>7/24 Destek</h3>
+                    <p>WhatsApp ve Telegram'dan her zaman ulaşabilirsiniz</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <h3>Kolay Ödeme</h3>
+                    <p>Bakiye sistemi ile pratik ödeme yönetimi</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Sipariş Takibi</h3>
+                    <p>Siparişlerinizi anlık olarak takip edin</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3>Uygun Fiyat</h3>
+                    <p>Kaliteli hizmet, makul fiyat</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="contact-card">
+                <div class="contact-content">
+                    <h2>Sorularınız mı var?</h2>
+                    <p>WhatsApp ve Telegram üzerinden 7/24 bize ulaşabilirsiniz</p>
+                    
+                    <div class="contact-buttons">
+                        <a href="https://wa.me/447795203704" target="_blank" class="contact-btn whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                            <div>
+                                <strong>WhatsApp</strong>
+                                <span>Hemen yazın</span>
+                            </div>
+                        </a>
+                        
+                        <a href="https://t.me/roxysatici" target="_blank" class="contact-btn telegram">
+                            <i class="fab fa-telegram"></i>
+                            <div>
+                                <strong>Telegram</strong>
+                                <span>Mesaj gönderin</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="contact-image">
+                    <i class="fas fa-comments"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="logo-text">
+                            <span class="logo-main">ROXY</span>
+                            <span class="logo-sub">STORE</span>
+                        </div>
+                    </div>
+                    <p>Hızlı ve güvenilir sosyal medya hizmetleri</p>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Hizmetler</h4>
+                        <a href="#services">Instagram</a>
+                        <a href="#services">TikTok</a>
+                        <a href="#services">YouTube</a>
+                        <a href="#services">Sanal Numara</a>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h4>Bilgi</h4>
+                        <a href="#features">Neden Biz?</a>
+                        <a href="#contact">İletişim</a>
+                        <a href="auth.html">Giriş Yap</a>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h4>Destek</h4>
+                        <a href="https://wa.me/447795203704" target="_blank">WhatsApp</a>
+                        <a href="https://t.me/roxysatici" target="_blank">Telegram</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 Roxy Store. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>

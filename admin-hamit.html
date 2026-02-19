@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    
+    <style>html.auth-loading body{opacity:0!important;pointer-events:none!important}</style>
+    <script>document.documentElement.classList.add('auth-loading');</script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Roxy Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin-hamit-style.css">
+</head>
+<body>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-grid"></div>
+
+    <div class="login-card">
+        <div class="logo-wrap">
+            <div class="logo-icon-big"><i class="fas fa-shield-alt"></i></div>
+            <div class="logo-title">ROXY STORE</div>
+            <div class="logo-subtitle">Admin Panel</div>
+        </div>
+
+        <div class="error-box" id="errorBox">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="errorText">Hatalı e-posta veya şifre.</span>
+        </div>
+
+        <div class="field-group">
+            <label class="field-label">E-posta</label>
+            <div class="input-wrap">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="email" class="text-input" id="adminEmail" placeholder="admin@roxy.com" oninput="hideError()" onkeydown="handleKey(event)">
+            </div>
+        </div>
+
+        <div class="field-group">
+            <label class="field-label">Şifre</label>
+            <div class="input-wrap">
+                <i class="fas fa-lock input-icon"></i>
+                <input type="password" class="text-input" id="adminPassword" placeholder="••••••••••" oninput="hideError()" onkeydown="handleKey(event)">
+                <button class="toggle-pw" type="button" onclick="togglePw()">
+                    <i class="fas fa-eye" id="pwEyeIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <button class="btn-login" id="btnLogin" onclick="handleLogin()">
+            <div class="spinner" id="loginSpinner"></div>
+            <i class="fas fa-arrow-right-to-bracket" id="loginIcon"></i>
+            <span id="loginText">Giriş Yap</span>
+        </button>
+
+        <div class="card-footer">
+            <div class="security-badge">
+                <i class="fas fa-lock"></i>
+                Güvenli yönetici girişi
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="admin-hamit-script.js"></script>
+</body>
+</html>

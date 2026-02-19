@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    
+    <style>html.auth-loading body{opacity:0!important;pointer-events:none!important}</style>
+    <script>document.documentElement.classList.add('auth-loading');</script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - Roxy Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="roxy-alerts.css">
+    <link rel="stylesheet" href="profile-style.css">
+</head>
+<body>
+
+    <!-- ANA EKRAN -->
+    <div id="profileMain">
+        <div class="cover-photo">
+            <div class="cover-overlay"></div>
+            <button class="btn-close-profile" onclick="window.location.href='dashboard.html'">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+        <div class="profile-info-section">
+            <div class="profile-avatar-wrap">
+                <div class="profile-initials-big" id="profileInitials">HA</div>
+                <div class="avatar-ring"></div>
+            </div>
+            <div class="profile-details">
+                <h2 class="profile-username" id="profileName">Ad Soyad</h2>
+                <p class="profile-email" id="profileEmail">—</p>
+                <span class="profile-badge unverified" id="verifyBadge"><i class="fas fa-check-circle"></i> Doğrulanmamış Hesap</span>
+            </div>
+        </div>
+        <div class="profile-container">
+            <div class="menu-section">
+                <p class="menu-section-title">Hesap Ayarları</p>
+                <button class="menu-item" onclick="openPasswordPanel()">
+                    <div class="menu-item-left">
+                        <div class="menu-icon password-icon"><i class="fas fa-lock"></i></div>
+                        <div>
+                            <span class="menu-label">Şifre Değiştir</span>
+                            <span class="menu-sub" id="lastPasswordChange">Son değişiklik: —</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </button>
+            </div>
+            <button class="btn-logout" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+            </button>
+        </div>
+    </div>
+
+    <!-- ŞİFRE PANELİ -->
+    <div id="passwordPanel" style="display:none; position:fixed; inset:0; background:#0A0A0F; overflow-y:auto; z-index:200;">
+        <div class="panel-header">
+            <button class="btn-back" onclick="closePasswordPanel()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Şifre Değiştir</h2>
+        </div>
+        <div class="panel-body">
+            <div class="rate-limit-info">
+                <i class="fas fa-clock"></i>
+                <p>Şifrenizi <strong>2 haftada 1 kez</strong> değiştirebilirsiniz.</p>
+            </div>
+
+            <div class="pw-rules" id="pwRulesProfile">
+                <div class="pw-rules-title"><i class="fas fa-shield-alt"></i> Şifre Kuralları</div>
+                <ul class="pw-rules-list">
+                    <li id="pRuleUpper"><span class="dot"></span> En az 1 büyük harf</li>
+                    <li id="pRuleLower"><span class="dot"></span> En az 1 küçük harf</li>
+                    <li id="pRuleNumber"><span class="dot"></span> En az 1 sayı</li>
+                    <li id="pRuleLength"><span class="dot"></span> En az 6 karakter</li>
+                </ul>
+            </div>
+
+            <div class="form-card">
+                <div class="field-group">
+                    <label class="field-label">Mevcut Şifre</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="text-input" id="oldPassword" placeholder="Mevcut şifrenizi girin" oninput="checkPasswordForm()">
+                        <button class="toggle-pw" type="button" onclick="togglePw('oldPassword', this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Yeni Şifre</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="text-input" id="newPassword" placeholder="Yeni şifrenizi girin" oninput="checkPasswordForm()">
+                        <button class="toggle-pw" type="button" onclick="togglePw('newPassword', this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                    <div class="pw-requirements">
+                        <span id="req-len"   class="req"><i class="fas fa-times-circle"></i> En az 8 karakter</span>
+                        <span id="req-upper" class="req"><i class="fas fa-times-circle"></i> Büyük harf</span>
+                        <span id="req-lower" class="req"><i class="fas fa-times-circle"></i> Küçük harf</span>
+                        <span id="req-num"   class="req"><i class="fas fa-times-circle"></i> Rakam</span>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Yeni Şifre Tekrar</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="text-input" id="confirmPassword" placeholder="Yeni şifrenizi tekrar girin" oninput="checkPasswordForm()">
+                        <button class="toggle-pw" type="button" onclick="togglePw('confirmPassword', this)"><i class="fas fa-eye"></i></button>
+                    </div>
+                    <span class="match-hint" id="matchHint"></span>
+                </div>
+                <button class="btn-save" id="btnSavePassword" onclick="savePassword()" disabled>
+                    <i class="fas fa-check"></i> Şifreyi Güncelle
+                </button>
+            </div>
+        </

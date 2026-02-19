@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap - Roxy Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="auth-style.css">
+    <link rel="stylesheet" href="roxy-alerts.css">
+</head>
+<body>
+    <!-- Custom Alert System -->
+    <div class="custom-alert" id="customAlert">
+        <div class="alert-content">
+            <div class="alert-icon" id="alertIcon"></div>
+            <div class="alert-text">
+                <h4 id="alertTitle"></h4>
+                <p id="alertMessage"></p>
+            </div>
+            <button class="alert-close" onclick="closeAlert()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="auth-page">
+        <!-- Background Effects -->
+        <div class="auth-bg">
+            <div class="bg-gradient bg-gradient-1"></div>
+            <div class="bg-gradient bg-gradient-2"></div>
+            <div class="bg-grid"></div>
+        </div>
+
+        <!-- Back to Home Button -->
+        <button class="back-home" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i>
+            <span>Ana Sayfa</span>
+        </button>
+
+        <!-- Auth Container -->
+        <div class="auth-container">
+            <div class="auth-card">
+                <!-- Logo -->
+                <div class="auth-logo">
+                    <div class="logo-icon">
+                        <img src="roxy-logo.svg" alt="Roxy" style="width:28px;height:28px;">
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-main">ROXY</span>
+                        <span class="logo-sub">STORE</span>
+                    </div>
+                </div>
+
+                <!-- Login Form -->
+                <div class="form-content active" id="loginForm">
+                    <h2 class="form-title">Hesabınıza Giriş Yapın</h2>
+                    <p class="form-subtitle">Hizmetlerimize erişmek için giriş yapın</p>
+
+                    <form class="auth-form" onsubmit="handleLogin(event)">
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <input type="email" id="loginEmail" placeholder="E-posta adresiniz" required>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <input type="password" id="loginPassword" placeholder="Şifreniz" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="rememberMe">
+                                <span>Oturumumu açık tut</span>
+                            </label>
+                            <button type="button" class="text-link" onclick="switchForm('forgot')">
+                                Şifrenizi mi unuttunuz?
+                            </button>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <span>Giriş Yap</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <div class="form-footer">
+                        <p>Hesabınız yok mu? <button class="text-link" onclick="switchForm('register')">Kayıt olun</button></p>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div class="form-content" id="registerForm">
+                    <h2 class="form-title">Yeni Hesap Oluşturun</h2>
+                    <p class="form-subtitle">Hizmetlerimizden yararlanmak için hesap açın</p>
+
+                    <form class="auth-form" onsubmit="handleRegister(event)">
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <input type="text" id="registerName" placeholder="Ad Soyad" required>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <input type="email" id="registerEmail" placeholder="E-posta adresiniz" required>
+                        </div>
+
+                        <div class="password-section">
+                            <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <input type="password" id="registerPassword" placeholder="Şifre (en az 8 karakter)" required minlength="8">
+                                <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength" id="passwordStrength"></div>
+                            
+                            <!-- Password Requirements - Animasyonlu -->
+                            <div class="password-requirements" id="passwordReqs">
+                                <div class="req-header">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Şifre Gereksinimleri</span>
+                                </div>
+                                <div class="req-list">
+                                    <div class="req-item" id="reqLength">
+                                        <i class="fas fa-times-circle"></i>
+                                        <span>En az 8 karakter</span>
+                                    </div>
+                                    <div class="req-item" id="reqUpper">
+                                        <i class="fas fa-times-circle"></i>
+                                        <span>En az bir büyük harf (A-Z)</span>
+                                    </div>
+                                    <div class="req-item" id="reqLower">
+                                        <i class="fas fa-times-circle"></i>
+                                        <span>En az bir küçük harf (a-z)</span>
+                                    </div>
+                                    <div class="req-item" id="reqNumber">
+                                        <i class="fas fa-times-circle"></i>
+                                        <span>En az bir sayı (0-9)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <input type="password" id="registerPasswordConfirm" placeholder="Şifre tekrar" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('registerPasswordConfirm')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <span>Hesap Oluştur</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <div class="form-footer">
+                        <p>Zaten hesabınız var mı? <button class="text-link" onclick="switchForm('login')">Giriş yapın</button></p>
+                    </div>
+                </div>
+
+                <!-- Forgot Password Form -->
+                <div class="form-content" id="forgotForm">
+                    <h2 class="form-title">Şifre Sıfırlama</h2>
+                    <p class="form-subtitle">E-posta adresinize şifre sıfırlama bağlantısı göndereceğiz</p>
+
+                    <form class="auth-form" onsubmit="handleForgot(event)">
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <input type="email" id="forgotEmail" placeholder="Kayıtlı e-posta adresiniz" required>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <span>Sıfırlama Bağlantısı Gönder</span>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+
+                    <!-- Success Message -->
+                    <div class="success-box" id="forgotSuccess" style="display: none;">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>E-posta Gönderildi</h3>
+                        <p class="success-desc">Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.</p>
+                        
+                        <div class="warning-box">
+                            <div class="warning-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="warning-content">
+                                <strong>Önemli!</strong>
+                                <p>E-posta bazen spam/gereksiz klasörüne düşebilir. Lütfen <strong>spam/gereksiz</strong> klasörünü kontrol edin ve bu adresi güvenli olarak işaretleyin.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="divider">
+                        <span>veya</span>
+                    </div>
+
+                    <div class="support-box">
+                        <p class="support-title">Sorun mu yaşıyorsunuz?</p>
+                        <div class="support-buttons">
+                            <a href="https://wa.me/447795203704" target="_blank" class="support-btn whatsapp">
+                                <i class="fab fa-whatsapp"></i>
+                                WhatsApp
+                            </a>
+                            <a href="https://t.me/roxysatici" target="_blank" class="support-btn telegram">
+                                <i class="fab fa-telegram"></i>
+                                Telegram
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="form-footer">
+                        <p>Şifrenizi hatırladınız mı? <button class="text-link" onclick="switchForm('login')">Giriş yapın</button></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="roxy-alerts.js"></script>
+    <script src="auth-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    
+    <style>html.auth-loading body{opacity:0!important;pointer-events:none!important}</style>
+    <script>document.documentElement.classList.add('auth-loading');</script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Roxy Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --primary:#00D9FF; --secondary:#A855F7; --accent:#00FF88;
+            --dark:#0A0A0F; --dark-2:#12121A; --dark-3:#1A1A28;
+            --border:rgba(0,217,255,0.12); --text:#FFF; --muted:#A0A0B8;
+            --error:#FF6584; --warn:#FFB347; --sidebar-w:260px;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Poppins',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;display:flex;}
+
+        /* ── SIDEBAR ── */
+        .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--dark-3);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .3s;overflow:hidden;}
+        .s-logo{display:flex;align-items:center;gap:14px;padding:22px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+        .s-logo-ico{width:42px;height:42px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#0A0A0F;flex-shrink:0;}
+        .s-logo-name{font-size:14px;font-weight:900;letter-spacing:1px;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .s-logo-role{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+        .s-nav{flex:1;min-height:0;overflow-y:auto;padding:10px 0;}
+        .s-nav::-webkit-scrollbar{width:3px;} .s-nav::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+        .nav-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:14px 20px 5px;}
+        .nav-btn{width:100%;display:flex;align-items:center;gap:12px;padding:11px 20px;background:none;border:none;border-left:3px solid transparent;color:var(--muted);font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;text-align:left;}
+        .nav-btn:hover{color:var(--text);background:rgba(255,255,255,.04);border-left-color:rgba(0,217,255,.4);}
+        .nav-btn.active{color:var(--primary);background:rgba(0,217,255,.08);border-left-color:var(--primary);font-weight:700;}
+        .nav-btn i{width:18px;font-size:15px;flex-shrink:0;} .nav-btn .lbl{flex:1;}
+        .nbadge{font-size:11px;font-weight:700;min-width:20px;height:20px;background:rgba(0,217,255,.15);color:var(--primary);border-radius:10px;padding:0 6px;display:flex;align-items:center;justify-content:center;}
+        .nbadge.warn{background:rgba(255,179,71,.15);color:var(--warn);} .nbadge.danger{background:rgba(255,101,132,.15);color:var(--error);}
+        .s-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+        .a-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#0A0A0F;flex-shrink:0;}
+        .a-name{font-size:13px;font-weight:700;} .a-role{font-size:10px;color:var(--muted);}
+        .btn-logout{margin-left:auto;background:rgba(255,101,132,.1);border:1px solid rgba(255,101,132,.2);border-radius:8px;color:var(--error);width:32px;height:32px;cursor:pointer;font-size:13px;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .btn-logout:hover{background:rgba(255,101,132,.22);}
+
+        /* ── MAIN ── */
+        .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+        .topbar{height:62px;background:var(--dark-3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100;flex-shrink:0;}
+        .topbar-l{display:flex;align-items:center;gap:14px;} .menu-toggle{display:none;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;}
+        .page-title{font-size:17px;font-weight:700;} .topbar-r{display:flex;align-items:center;gap:14px;}
+        .clock{font-size:13px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums;}
+        .live{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--accent);background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);padding:4px 12px;border-radius:20px;}
+        .live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--accent);animation:blink 2s ease-in-out infinite;}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+        .content{padding:28px;flex:1;}
+        .sec{display:none;animation:fadeUp .2s ease;} .sec.active{display:block;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+        /* ── STAT GRID ── */
+        .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+        .stat-card{background:var(--dark-3);border:1px solid var(--border);border-radius:18px;padding:22px;display:flex;align-items:center;gap:16px;transition:transform .2s;}
+        .stat-card:hover{transform:translateY(-3px);}
+        .stat-ico{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+        .ico-b{background:rgba(0,217,255,.12);color:var(--primary);} .ico-p{background:rgba(168,85,247,.12);color:var(--secondary);}
+        .ico-g{background:rgba(0,255,136,.12);color:var(--accent);}  .ico-o{background:rgba(255,115,0,.12);color:#FF7B54;}
+        .ico-y{background:rgba(255,179,71,.12);color:var(--warn);}   .ico-t{background:rgba(0,200,180,.12);color:#00C8B4;}
+        .stat-val{font-size:28px;font-weight:900;line-height:1;} .stat-lbl{font-size:12px;color:var(--muted);margin-top:4px;}
+
+        .info-box{display:flex;align-items:flex-start;gap:16px;padding:20px 24px;background:rgba(0,217,255,.04);border:1px solid rgba(0,217,255,.15);border-radius:16px;}
+        .info-box i{color:var(--primary);font-size:22px;flex-shrink:0;margin-top:1px;}
+        .info-box strong{display:block;margin-bottom:4px;} .info-box p{color:var(--muted);font-size:13px;line-height:1.6;}
+
+        /* ── SECTION HEADER ── */
+        .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+        .sec-hdr h2{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px;} .sec-hdr h2 i{color:var(--primary);}
+        .fsel{background:var(--dark-3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;padding:8px 14px;outline:none;cursor:pointer;}
+        .fsel:focus{border-color:var(--primary);}
+
+        /* ── TABLE ── */
+        .tbl-wrap{overflow-x:auto;border-radius:16px;border:1px solid var(--border);}
+        .tbl{width:100%;border-collapse:collapse;font-size:13px;}
+        .tbl thead tr{background:var(--dark-3);border-bottom:1px solid var(--border);}
+        .tbl th{padding:13px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+        .tbl td{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
+        .tbl tbody tr:last-child td{border-bottom:none;} .tbl tbody tr:hover td{background:rgba(255,255,255,.02);}
+        .empty-row{text-align:center;color:var(--muted);padding:44px !important;}
+        .empty-row i{display:block;font-size:30px;margin-bottom:10px;opacity:.3;}
+
+        /* ── BADGES ── */
+        .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+        .b-pend{background:rgba(255,179,71,.15);color:var(--warn);}
+        .b-proc{background:rgba(0,217,255,.15);color:var(--primary);}
+        .b-done{background:rgba(0,255,136,.15);color:var(--accent);}
+        .b-canc{background:rgba(255,101,132,.15);color:var(--error);}
+        .b-open{background:rgba(0,255,136,.15);color:var(--accent);}
+        .b-clsd{background:rgba(160,160,184,.15);color:var(--muted);}
+
+        /* ── ACTION BUTTONS ── */
+        .abtn{padding:5px 11px;border-radius:8px;font-size:12px;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;border:1px solid;transition:all .2s;display:inline-flex;align-items:center;gap:5px;margin-right:4px;}
+        .abtn:last-child{margin-right:0;}
+        .ag{background:rgba(0,255,136,.1);color:var(--accent);border-color:rgba(0,255,136,.25);}
+        .ar{background:rgba(255,101,132,.1);color:var(--error);border-color:rgba(255,101,132,.25);}
+        .ab{background:rgba(0,217,255,.1);color:var(--primary);border-color:rgba(0,217,255,.25);}
+        .agr{background:rgba(160,160,184,.1);color:var(--muted);border-color:rgba(160,160,184,.25);}
+        .abtn:hover{opacity:.8;transform:translateY(-1px);}
+
+        /* ── REVIEW CARDS ── */
+        .rev-card{background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;transition:transform .2s;}
+        .rev-card:hover{transform:translateY(-2px);}
+        .rc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+        .rc-user{font-size:14px;font-weight:700;margin-bottom:4px;}
+        .rc-stars i{color:#FFB347;font-size:13px;} .rc-stars i.dim{color:rgba(255,255,255,.15);}
+        .rc-text{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+        .rc-actions{display:flex;flex-wrap:wrap;gap:6px;}
+
+        /* ── MODAL ── */
+        .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;padding:16px;}
+        .modal-bg.show{display:flex;}
+        .modal{background:var(--dark-3);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:480px;animation:fadeUp .2s ease;}
+        .modal h3{font-size:18px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+        .modal h3 i{color:var(--primary);}
+        .modal-field{margin-bottom:16px;}
+        .modal-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+        .modal-input,.modal-select,.modal-textarea{width:100%;background:var(--dark-2);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;padding:10px 14px;outline:none;transition:border .2s;resize:vertical;}
+        .modal-input:focus,.modal-select:focus,.modal-textarea:focus{border-color:var(--primary);}
+        .modal-actions{display:flex;gap:10px;margin-top:20px;} .modal-actions button{flex:1;}
+        .btn-modal-save{padding:12px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#0A0A0F;font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;}
+        .btn-modal-save:hover{opacity:.9;}
+        .btn-modal-cancel{padding:12px;border:1px solid var(--border);border-radius:12px;background:transparent;color:var(--muted);font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s;}
+        .btn-modal-cancel:hover{border-color:var(--primary);color:var(--text);}
+        .modal-info{background:rgba(0,217,255,.06);border:1px solid rgba(0,217,255,.15);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;line-height:1.6;color:var(--muted);}
+        .modal-info strong{color:var(--text);}
+
+        /* ── EMPTY / OVERLAY ── */
+        .empty-sec{text-align:center;padding:60px 20px;color:var(--muted);}
+        .empty-sec i{display:block;font-size:42px;margin-bottom:14px;opacity:.25;}
+        .s-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:190;}
+
+        @media(max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr);}}
+        @media(max-width:768px){
+            .sidebar{transform:translateX(-100%);} .sidebar.open{transform:translateX(0);}
+            .s-overlay.show{display:block;} .main{margin-left:0;} .menu-toggle{display:block;}
+            .content{padding:16px;} .topbar{padding:0 16px;} .clock{display:none;}
+        }
+        @media(max-width:520px){.stat-grid{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar" id="sidebar">
+    <div class="s-logo">
+        <div class="s-logo-ico"><i class="fas fa-shield-alt"></i></div>
+        <div><div class="s-logo-name">ROXY STORE</div><div class="s-logo-role">Admin Panel</div></div>
+    </div>
+    <nav class="s-nav">
+        <div class="nav-lbl">Genel</div>
+        <button class="nav-btn active" data-sec="overview"><i class="fas fa-chart-pie"></i><span class="lbl">Genel Bakış</span></button>
+
+        <div class="nav-lbl">Siparişler</div>
+        <button class="nav-btn" data-sec="vn"><i class="fas fa-mobile-alt"></i><span class="lbl">Sanal Numara</span><span class="nbadge" id="bdg-vn">0</span></button>
+        <button class="nav-btn" data-sec="smm"><i class="fas fa-chart-line"></i><span class="lbl">Sosyal Medya</span><span class="nbadge" id="bdg-smm">0</span></button>
+
+        <div class="nav-lbl">Finans</div>
+        <button class="nav-btn" data-sec="balance"><i class="fas fa-university"></i><span class="lbl">Bakiye Onayları</span><span class="nbadge warn" id="bdg-bal">0</span></button>
+
+        <div class="nav-lbl">Müşteri</div>
+        <button class="nav-btn" data-sec="tickets"><i class="fas fa-headset"></i><span class="lbl">Destek Talepleri</span><span class="nbadge danger" id="bdg-tkt">0</span></button>
+        <button class="nav-btn" data-sec="reviews"><i class="fas fa-star"></i><span class="lbl">Değerlendirmeler</span><span class="nbadge warn" id="bdg-rev">0</span></button>
+
+        <div class="nav-lbl">Yönetim</div>
+        <button class="nav-btn" data-sec="users"><i class="fas fa-users"></i><span class="lbl">Kullanıcılar</span></button>
+    </nav>
+    <div class="s-foot">
+        <div class="a-avatar"><i class="fas fa-user-shield"></i></div>
+        <div><div class="a-name" id="adminName">Hamit</div><div class="a-role">Süper Yönetici</div></div>
+        <button class="btn-logout" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+</div>
+<div class="s-overlay" id="sOverlay" onclick="closeSidebar()"></div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+    <div class="topbar">
+        <div class="topbar-l">
+            <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="page-title" id="pageTitle">Genel Bakış</div>
+        </div>
+        <div class="topbar-r">
+            <div class="clock" id="clock"></div>
+            <div class="live">Canlı</div>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- GENEL BAKIŞ -->
+        <div class="sec active" id="sec-overview">
+            <div class="stat-grid">
+                <div class="stat-card"><div class="stat-ico ico-b"><i class="fas fa-mobile-alt"></i></div><div><div class="stat-val" id="st-vn">—</div><div class="stat-lbl">Sanal Numara Siparişi</div></div></div>
+                <div class="stat-card"><div class="stat-ico ico-p"><i class="fas fa-chart-line"></i></div><div><div class="stat-val" id="st-smm">—</div><div class="stat-lbl">SMM Siparişi</div></div></div>
+                <div class="stat-card"><div class="stat-ico ico-g"><i class="fas fa-wallet"></i></div><div><div class="stat-val" id="st-bal">—</div><div class="stat-lbl">Onaylanan Bakiye</div></div></div>
+                <div class="stat-card"><div class="stat-ico ico-o"><i class="fas fa-headset"></i></div><div><div class="stat-val" id="st-tkt">—</div><div class="stat-lbl">Açık Destek Talebi</div></div></div>
+                <div class="stat-card"><div class="stat-ico ico-y"><i class="fas fa-star"></i></div><div><div class="stat-val" id="st-rev">—</div><div class="stat-lbl">Bekleyen Yorum</div></div></div>
+                <div class="stat-card"><div class="stat-ico ico-t"><i class="fas fa-users"></i></div><div><div class="stat-val" id="st-usr">—</div><div class="stat-lbl">Toplam Kullanıcı</div></div></div>
+            </div>
+            <div class="info-box"><i class="fas fa-sync-alt"></i><div><strong>Gerçek Zamanlı Firebase Verisi</strong><p>Tüm istatistikler ve tablolar Firestore'dan gerçek zamanlı çekilmektedir. Yeni sipariş, talep veya kullanıcı geldiğinde otomatik güncellenir.</p></div></div>
+        </div>
+
+        <!-- SANAL NUMARA -->
+        <div class="sec" id="sec-vn">
+            <div class="sec-hdr">
+                <h2><i class="fas fa-mobile-alt"></i> Sanal Numara Siparişleri</h2>
+                <select class="fsel" id="filt-vn" onchange="renderVN()"><option value="">Tümü</option><option value="pending">Beklemede</option><option value="processing">İşleniyor</option><option value="completed">Tamamlandı</option><option value="cancelled">İptal</option></select>
+            </div>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Sipariş No</th><th>Kullanıcı</th><th>Platform</th><th>Tutar</th><th>Tarih</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="vnBody"><tr><td colspan="7" class="empty-row"><i class="fas fa-spinner fa-spin"></i>Yükleniyor...</td></tr></tbody></table></div>
+        </div>
+
+        <!-- SMM -->
+        <div class="sec" id="sec-smm">
+            <div class="sec-hdr">
+                <h2><i class="fas fa-chart-line"></i> Sosyal Medya Siparişleri</h2>
+                <select class="fsel" id="filt-smm" onchange="renderSMM()"><option value="">Tümü</option><option value="pending">Beklemede</option><option value="processing">İşleniyor</option><option value="completed">Tamamlandı</option><option value="cancelled">İptal</option></select>
+            </div>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Sipariş No</th><th>Kullanıcı</th><th>Platform</th><th>Servis</th><th>Miktar</th><th>Tutar</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="smmBody"><tr><td colspan="8" class="empty-row"><i class="fas fa-spinner fa-spin"></i>Yükleniyor...</td></tr></tbody></table></div>
+        </div>
+
+        <!-- BAKİYE ONAYLARI -->
+        <div class="sec" id="sec-balance">
+            <div class="sec-hdr"><h2><i class="fas fa-university"></i> Bakiye Onayları</h2></div>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Kullanıcı</th><th>Tutar</th><th>İşlem No</th><th>Tarih</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="balBody"><tr><td colspan="6" class="empty-row"><i class="fas fa-spinner fa-spin"></i>Yükleniyor...</td></tr></tbody></table></div>
+        </div>
+
+        <!-- DESTEK TALEPLERİ -->
+        <div class="sec" id="sec-tickets">
+            <div class="sec-hdr">
+                <h2><i class="fas fa-headset"></i> Destek Talepleri</h2>
+                <select class="fsel" id="filt-tkt" onchange="renderTickets()"><option value="">Tümü</option><option value="open">Açık</option><option value="closed">Kapalı</option></select>
+            </div>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Talep No</th><th>Kullanıcı</th><th>Başlık</th><th>Kategori</th><th>Tarih</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="tktBody"><tr><td colspan="7" class="empty-row"><i class="fas fa-spinner fa-spin"></i>Yükleniyor...</td></tr></tbody></table></div>
+        </div>
+
+        <!-- DEĞERLENDİRMELER -->
+        <div class="sec" id="sec-reviews">
+            <div class="sec-hdr">
+                <h2><i class="fas fa-star"></i> Değerlendirmeler</h2>
+                <select class="fsel" id="filt-rev" onchange="renderReviews()"><option value="">Tümü</option><option value="pending">Bekliyor</option><option value="approved">Onaylandı</option><option value="replied">Yanıtlandı</option><option value="rejected">Reddedildi</option></select>
+            </div>
+            <div id="revCards"><div class="empty-sec"><i class="fas fa-spinner fa-spin" style="opacity:1"></i><p>Yükleniyor...</p></div></div>
+        </div>
+
+        <!-- KULLANICILAR -->
+        <div class="sec" id="sec-users">
+            <div class="sec-hdr"><h2><i class="fas fa-users"></i> Kullanıcılar</h2></div>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Bakiye</th><th>Kayıt Tarihi</th><th>İşlem</th></tr></thead><tbody id="usrBody"><tr><td colspan="5" class="empty-row"><i class="fas fa-spinner fa-spin"></i>Yükleniyor...</td></tr></tbody></table></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ══ MODALLER ══ -->
+
+<!-- Sipariş Detay / Durum Modal -->
+<div class="modal-bg" id="orderModal">
+    <div class="modal">
+        <h3><i class="fas fa-edit"></i> Sipariş Düzenle</h3>
+        <div class="modal-info" id="orderModalInfo"></div>
+        <div class="modal-field">
+            <label class="modal-label">Durum</label>
+            <select class="modal-select" id="orderStatusSel">
+                <option value="pending">⏳ Beklemede</option>
+                <option value="processing">⚙️ İşleniyor</option>
+                <option value="completed">✅ Tamamlandı</option>
+                <option value="cancelled">❌ İptal</option>
+            </select>
+        </div>
+        <div class="modal-field">
+            <label class="modal-label">Dahili Not (isteğe bağlı)</label>
+            <textarea class="modal-textarea" id="orderNote" rows="3" placeholder="Kullanıcıya gösterilmez..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="closeModal('orderModal')">Vazgeç</button>
+            <button class="btn-modal-save" onclick="saveOrderStatus()"><i class="fas fa-check"></i> Kaydet</button>
+        </div>
+    </div>
+</div>
+
+<!-- Destek Yanıt Modal -->
+<div class="modal-bg" id="ticketModal">
+    <div class="modal">
+        <h3><i class="fas fa-reply"></i> Talebe Yanıt Ver</h3>
+        <div class="modal-info" id="ticketModalInfo"></div>
+        <div class="modal-field">
+            <label class="modal-label">Yanıtınız</label>
+            <textarea class="modal-textarea" id="ticketReply" rows="4" placeholder="Kullanıcıya gönderilecek yanıt..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="closeModal('ticketModal')">Vazgeç</button>
+            <button class="btn-modal-save" onclick="saveTicketReply()"><i class="fas fa-paper-plane"></i> Yanıtla & Kapat</button>
+        </div>
+    </div>
+</div>
+
+<!-- Yorum Yanıt Modal -->
+<div class="modal-bg" id="reviewModal">
+    <div class="modal">
+        <h3><i class="fas fa-comment-dots"></i> Yorumu Yanıtla</h3>
+        <div class="modal-info" id="reviewModalInfo"></div>
+        <div class="modal-field">
+            <label class="modal-label">Yanıtınız</label>
+            <textarea class="modal-textarea" id="reviewReply" rows="4" placeholder="Kullanıcıya gösterilecek yanıt..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="closeModal('reviewModal')">Vazgeç</button>
+            <button class="btn-modal-save" onclick="saveReviewReply()"><i class="fas fa-check"></i> Yanıtla & Yayınla</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── FİREBASE CONFIG ──
+firebase.initializeApp({
+    apiKey:            "AIzaSyBf2A1GhEzruI_6lfCNbq4MsbU8hxFjoqI",
+    authDomain:        "roxy-store-67c53.firebaseapp.com",
+    projectId:         "roxy-store-67c53",
+    storageBucket:     "roxy-store-67c53.firebasestorage.app",
+    messagingSenderId: "450502544206",
+    appId:             "1:450502544206:web:502d0200dc35ecacfc2c1f"
+});
+var db   = firebase.firestore();
+var auth = firebase.auth();
+
+// ── AUTH GUARD (sadece 1 kez çalışır) ──
+var _adminInit = false;
+var _unsubAdmin = auth.onAuthStateChanged(function(user) {
+    _unsubAdmin(); // Dinlemeyi durdur - token yenilemesinde tekrar tetiklenmesin
+    if (!user || user.email !== 'hamitcanaktas5@gmail.com') {
+        window.location.href = 'admin-hamit.html';
+        return;
+    }
+    if (_adminInit) return;
+    _adminInit = true;
+    document.getElementById('adminName').textContent = 'Hamit';
+    initDashboard();
+});
+
+var DATA = { vn:[], smm:[], balance:[], tickets:[], reviews:[], users:[] };
+var currentOrderId = null, currentTicketId = null, currentReviewId = null;
+
+// ── YARDIMCILAR ──
+function fmt(n){ return Math.round(n).toLocaleString('tr-TR') + ' ₺'; }
+function fmtDate(ts){
+    if (!ts) return '—';
+    var d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('tr-TR') + ' ' + d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+}
+function badge(s){
+    var m = {
+        pending:   ['b-pend','⏳ Beklemede'],  processing:['b-proc','⚙️ İşleniyor'],
+        completed: ['b-done','✅ Tamamlandı'], cancelled: ['b-canc','❌ İptal'],
+        open:      ['b-open','🟢 Açık'],       closed:    ['b-clsd','⚫ Kapalı'],
+        approved:  ['b-done','✅ Onaylandı'],  rejected:  ['b-canc','❌ Reddedildi'],
+        replied:   ['b-proc','💬 Yanıtlandı'], pending_r: ['b-pend','⏳ Bekliyor']
+    };
+    var i = m[s]||['b-pend',s]; return '<span class="badge '+i[0]+'">'+i[1]+'</span>';
+}
+function stars(n){
+    var h=''; for(var i=1;i<=5;i++) h+='<i class="fas fa-star'+(i<=n?'':' dim')+'"></i>'; return h;
+}
+
+// ── VERİ YÜKLE ──
+async function initDashboard() {
+    await Promise.all([loadVN(), loadSMM(), loadBalance(), loadTickets(), loadReviews(), loadUsers()]);
+    updateStats();
+}
+
+async function loadVN() {
+    var snap = await db.collection('orders').where('type','==','vn').get();
+    DATA.vn = []; snap.forEach(function(d){ DATA.vn.push({id:d.id, ...d.data()}); });
+    renderVN();
+}
+async function loadSMM() {
+    var snap = await db.collection('orders').where('type','==','smm').get();
+    DATA.smm = []; snap.forEach(function(d){ DATA.smm.push({id:d.id, ...d.data()}); });
+    renderSMM();
+}
+async function loadBalance() {
+    var snap = await db.collection('balance_requests').get();
+    DATA.balance = []; snap.forEach(function(d){ DATA.balance.push({id:d.id, ...d.data()}); });
+    renderBalance();
+}
+async function loadTickets() {
+    var snap = await db.collection('tickets').get();
+    DATA.tickets = []; snap.forEach(function(d){ DATA.tickets.push({id:d.id, ...d.data()}); });
+    renderTickets();
+}
+async function loadReviews() {
+    var snap = await db.collection('reviews').get();
+    DATA.reviews = []; snap.forEach(function(d){ DATA.reviews.push({id:d.id, ...d.data()}); });
+    renderReviews();
+}
+async function loadUsers() {
+    var snap = await db.collection('users').get();
+    DATA.users = []; snap.forEach(function(d){ DATA.users.push({id:d.id, ...d.data()}); });
+    renderUsers();
+}
+
+// ── İSTATİSTİKLER ──
+function updateStats() {
+    document.getElementById('st-vn').textContent  = DATA.vn.length;
+    document.getElementById('st-smm').textContent = DATA.smm.length;
+    var totalBal = DATA.balance.filter(function(b){return b.status==='approved';}).reduce(function(s,b){return s+b.amount;},0);
+    document.getElementById('st-bal').textContent = fmt(totalBal);
+    document.getElementById('st-tkt').textContent = DATA.tickets.filter(function(t){return t.status==='open';}).length;
+    document.getElementById('st-rev').textContent = DATA.reviews.filter(function(r){return r.status==='pending';}).length;
+    document.getElementById('st-usr').textContent = DATA.users.length;
+    document.getElementById('bdg-vn').textContent  = DATA.vn.filter(function(o){return o.status==='pending'||o.status==='processing';}).length;
+    document.getElementById('bdg-smm').textContent = DATA.smm.filter(function(o){return o.status==='pending';}).length;
+    document.getElementById('bdg-bal').textContent = DATA.balance.filter(function(b){return b.status==='pending';}).length;
+    document.getElementById('bdg-tkt').textContent = DATA.tickets.filter(function(t){return t.status==='open';}).length;
+    document.getElementById('bdg-rev').textContent = DATA.reviews.filter(function(r){return r.status==='pending';}).length;
+}
+
+// ── RENDER FONKSİYONLARI ──
+function renderVN() {
+    var f = document.getElementById('filt-vn').value;
+    var rows = DATA.vn.filter(function(o){return !f||o.status===f;});
+    var body = document.getElementById('vnBody');
+    if (!rows.length) { body.innerHTML='<tr><td colspan="7" class="empty-row"><i class="fas fa-inbox"></i>Sipariş yok</td></tr>'; return; }
+    body.innerHTML = rows.map(function(o){
+        return '<tr><td><code style="color:var(--primary);font-size:12px">'+o.orderId+'</code></td>'+
+            '<td>'+o.userEmail+'</td><td>'+o.platform+'</td><td>'+fmt(o.price)+'</td>'+
+            '<td style="color:var(--muted);font-size:12px">'+fmtDate(o.createdAt)+'</td>'+
+            '<td>'+badge(o.status)+'</td>'+
+            '<td><button class="abtn ab" onclick="openOrderModal(\''+o.id+'\',\'vn\')"><i class="fas fa-edit"></i> Düzenle</button></td></tr>';
+    }).join('');
+}
+
+function renderSMM() {
+    var f = document.getElementById('filt-smm').value;
+    var rows = DATA.smm.filter(function(o){return !f||o.status===f;});
+    var body = document.getElementById('smmBody');
+    if (!rows.length) { body.innerHTML='<tr><td colspan="8" class="empty-row"><i class="fas fa-inbox"></i>Sipariş yok</td></tr>'; return; }
+    body.innerHTML = rows.map(function(o){
+        return '<tr><td><code style="color:var(--primary);font-size:12px">'+o.orderId+'</code></td>'+
+            '<td>'+o.userEmail+'</td><td>'+o.platform+'</td><td>'+o.service+'</td>'+
+            '<td>'+o.amount.toLocaleString('tr-TR')+'</td><td>'+fmt(o.price)+'</td>'+
+            '<td>'+badge(o.status)+'</td>'+
+            '<td><button class="abtn ab" onclick="openOrderModal(\''+o.id+'\',\'smm\')"><i class="fas fa-edit"></i> Düzenle</button></td></tr>';
+    }).join('');
+}
+
+function renderBalance() {
+    var rows = DATA.balance;
+    var body = document.getElementById('balBody');
+    if (!rows.length) { body.innerHTML='<tr><td colspan="6" class="empty-row"><i class="fas fa-inbox"></i>Talep yok</td></tr>'; return; }
+    body.innerHTML = rows.map(function(b){
+        var btns = b.status==='pending'
+            ? '<button class="abtn ag" onclick="approveBalance(\''+b.id+'\','+b.amount+',\''+b.userId+'\')"><i class="fas fa-check"></i> Onayla</button>'+
+              '<button class="abtn ar" onclick="rejectBalance(\''+b.id+'\')"><i class="fas fa-times"></i> Reddet</button>'
+            : badge(b.status);
+        return '<tr><td>'+b.userEmail+'</td><td><strong>'+fmt(b.amount)+'</strong></td>'+
+            '<td><code style="color:var(--muted);font-size:12px">'+b.transactionId+'</code></td>'+
+            '<td style="color:var(--muted);font-size:12px">'+fmtDate(b.createdAt)+'</td>'+
+            '<td>'+badge(b.status)+'</td><td>'+btns+'</td></tr>';
+    }).join('');
+}
+
+function renderTickets() {
+    var f = document.getElementById('filt-tkt').value;
+    var rows = DATA.tickets.filter(function(t){return !f||t.status===f;});
+    var body = document.getElementById('tktBody');
+    if (!rows.length) { body.innerHTML='<tr><td colspan="7" class="empty-row"><i class="fas fa-inbox"></i>Talep yok</td></tr>'; return; }
+    body.innerHTML = rows.map(function(t){
+        var btns = t.status==='open'
+            ? '<button class="abtn ab" onclick="openTicketModal(\''+t.id+'\')"><i class="fas fa-reply"></i> Yanıtla</button>'+
+              '<button class="abtn agr" onclick="closeTicket(\''+t.id+'\')"><i class="fas fa-lock"></i> Kapat</button>'
+            : '<button class="abtn agr" onclick="openTicketModal(\''+t.id+'\')"><i class="fas fa-eye"></i> Görüntüle</button>';
+        return '<tr><td><code style="color:var(--primary);font-size:12px">'+t.ticketId+'</code></td>'+
+            '<td>'+t.userEmail+'</td><td>'+t.title+'</td>'+
+            '<td style="color:var(--muted)">'+t.category+'</td>'+
+            '<td style="color:var(--muted);font-size:12px">'+fmtDate(t.createdAt)+'</td>'+
+            '<td>'+badge(t.status)+'</td><td>'+btns+'</td></tr>';
+    }).join('');
+}
+
+function renderReviews() {
+    var f = document.getElementById('filt-rev').value;
+    var rows = DATA.reviews.filter(function(r){return !f||r.status===f;});
+    var cont = document.getElementById('revCards');
+    if (!rows.length) { cont.innerHTML='<div class="empty-sec"><i class="fas fa-star"></i><p>Değerlendirme yok</p></div>'; return; }
+    cont.innerHTML = rows.map(function(r){
+        var btns = '';
+        if (r.status==='pending') {
+            btns = '<button class="abtn ag" onclick="approveReview(\''+r.id+'\')"><i class="fas fa-check"></i> Onayla</button>'+
+                   '<button class="abtn ar" onclick="rejectReview(\''+r.id+'\')"><i class="fas fa-times"></i> Reddet</button>'+
+                   '<button class="abtn ab" onclick="openReviewModal(\''+r.id+'\')"><i class="fas fa-reply"></i> Yanıtla & Yayınla</button>';
+        } else {
+            btns = '<button class="abtn ab" onclick="openReviewModal(\''+r.id+'\')"><i class="fas fa-reply"></i> Yanıtla</button>';
+        }
+        return '<div class="rev-card">'+
+            '<div class="rc-top">'+
+                '<div><div class="rc-user">'+r.userName+'</div><div class="rc-stars">'+stars(r.rating)+'</div></div>'+
+                '<div style="text-align:right">'+badge(r.status)+'<div style="font-size:11px;color:var(--muted);margin-top:4px">'+fmtDate(r.createdAt)+'</div></div>'+
+            '</div>'+
+            '<p class="rc-text">'+r.text+'</p>'+
+            (r.reply ? '<div style="background:rgba(0,217,255,.06);border:1px solid rgba(0,217,255,.15);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:var(--muted)"><strong style="color:var(--primary)">🛡 Roxy Store:</strong> '+r.reply+'</div>' : '')+
+            '<div class="rc-actions">'+btns+'</div>'+
+        '</div>';
+    }).join('');
+}
+
+function renderUsers() {
+    var body = document.getElementById('usrBody');
+    if (!DATA.users.length) { body.innerHTML='<tr><td colspan="5" class="empty-row"><i class="fas fa-inbox"></i>Kullanıcı yok</td></tr>'; return; }
+    body.innerHTML = DATA.users.map(function(u){
+        return '<tr>'+
+            '<td><strong>'+u.name+'</strong></td>'+
+            '<td style="color:var(--muted)">'+u.email+'</td>'+
+            '<td><strong style="color:var(--accent)">'+fmt(u.balance||0)+'</strong></td>'+
+            '<td style="color:var(--muted);font-size:12px">'+fmtDate(u.createdAt)+'</td>'+
+            '<td><button class="abtn ab"><i class="fas fa-eye"></i> Profil</button></td></tr>';
+    }).join('');
+}
+
+// ── SİPARİŞ MODAL ──
+function openOrderModal(id, type) {
+    currentOrderId = id;
+    var arr = type==='vn' ? DATA.vn : DATA.smm;
+    var o = arr.find(function(x){return x.id===id;});
+    if (!o) return;
+    document.getElementById('orderModalInfo').innerHTML =
+        '<strong>'+o.orderId+'</strong> · '+o.platform+(o.service?' · '+o.service:'')+'<br>'+
+        'Kullanıcı: '+o.userEmail+' · Tutar: '+fmt(o.price);
+    document.getElementById('orderStatusSel').value = o.status || 'pending';
+    document.getElementById('orderNote').value = o.note || '';
+    document.getElementById('orderModal').classList.add('show');
+}
+
+async function saveOrderStatus() {
+    var status = document.getElementById('orderStatusSel').value;
+    var note   = document.getElementById('orderNote').value.trim();
+    try {
+        await db.collection('orders').doc(currentOrderId).update({ status: status, note: note });
+        closeModal('orderModal');
+        await loadVN(); await loadSMM();
+        updateStats();
+        alert('✅ Sipariş güncellendi!');
+    } catch(e) { alert('Hata: '+e.message); }
+}
+
+// ── BAKİYE ONAY/RED ──
+async function approveBalance(id, amount, userId) {
+    if (!confirm('₺'+amount+' bakiye onaylanacak. Emin misiniz?')) return;
+    try {
+        var userSnap = await db.collection('users').doc(userId).get();
+        var current  = userSnap.data().balance || 0;
+        await db.collection('users').doc(userId).update({ balance: current + amount });
+        await db.collection('balance_requests').doc(id).update({ status: 'approved' });
+        await loadBalance(); updateStats();
+        alert('✅ Bakiye onaylandı ve kullanıcıya yüklendi!');
+    } catch(e) { alert('Hata: '+e.message); }
+}
+
+async function rejectBalance(id) {
+    if (!confirm('Bu talep reddedilecek. Emin misiniz?')) return;
+    try {
+        await db.collection('balance_requests').doc(id).update({ status: 'rejected' });
+        await loadBalance(); updateStats();
+        alert('❌ Bakiye talebi reddedildi.');
+    } catch(e) { alert('Hata: '+e.message); }
+}
+
+// ── TİCKET MODAL ──
+function openTicketModal(id) {
+    currentTicketId = id;
+    var t = DATA.tickets.find(function(x){return x.id===id;});
+    if (!t) return;
+    document.getElementById('ticketModalInfo').innerHTML =
+        '<strong>'+t.ticketId+'</strong> · '+t.title+'<br>Kullanıcı: '+t.userEmail;
+    var msgs = (t.messages||[]).map(function(m){
+        return '<div style="margin-bottom:8px;padding:8px 10px;background:'+(m.sender==='user'?'rgba(0,217,255,.06)':'rgba(168,85,247,.06)')+';border-radius:8px;font-size:13px;">'+
+            '<strong style="color:'+(m.sender==='user'?'var(--primary)':'var(--secondary)'+'">')+(m.sender==='user'?'Kullanıcı':'Admin')+'</strong>: '+m.text+'</div>';
+    }).join('');
+    document.getElementById('ticketModalInfo').innerHTML += msgs ? '<div style="margin-top:10px">'+msgs+'</div>' : '';
+    document.getElementById('ticketReply').value = '';
+    document.getElementById('ticketModal').classList.add('show');
+}
+
+async function saveTicketReply() {
+    var reply = document.getElementById('ticketReply').value.trim();
+    if (!reply) { alert('Yanıt boş olamaz!'); return; }
+    try {
+        var msg = { sender:'admin', text:reply, timestamp: new Date().toISOString() };
+        await db.collection('tickets').doc(currentTicketId).update({
+            status: 'closed',
+            messages: firebase.firestore.FieldValue.arrayUnion(msg)
+        });
+        closeModal('ticketModal');
+        await loadTickets(); updateStats();
+        alert('✅ Yanıt gönderildi ve talep kapatıldı!');
+    } catch(e) { alert('Hata: '+e.message); }
+}
+
+async function closeTicket(id) {
+    if (!confirm('Talep kapatılacak. Emin misiniz?')) return;
+    try {
+        await db.collection('tickets').doc(id).update({ status:'closed' });
+        await loadTickets(); updateStats();
+    } catch(e) { alert('Hata: '+e.message); }
+}
+
+// ── YORUM MODAL ──
+function openReviewModal(id) {
+    currentReviewId = id;
+    var r = DATA.reviews.find(function(x){return x.id===id;});
+    if (!r) return;
+    document.getElementById('reviewModalInfo').innerHTML =
+        '<strong>'+r.userName+'</strong> · '+stars(r.rating)+'<br><em style="color:var(--muted)">'+r.text+'</em>';
+    document.getElementById('reviewReply').value = r.reply || '';
+    document.getElementById('reviewModal').classList.add('show');
+}
+
+async function approveReview(id) {
+    if (!confirm('Yorum onaylanacak ve yayınlanacak.')) return;
+    try {
+        await db.collection('reviews').doc(id).update({ status:'approved' });
+        await loadReviews(); updateStats();
+    } catch(e) { alert('Hata: '+e.message); }
+}
+
+async function rejectReview(id) {
+    if (!confirm('Yorum reddedilecek.')) return;
+    try {
+        await db.collection('reviews').doc(id).update({ status:'rejected' });
+        await loadReviews(); updateStats();
+    } catch(e) { alert('Hata: '+e.message); }
+}
+
+async function saveReviewReply() {
+    var reply = document.getElementById('reviewReply').value.trim();
+    if (!reply) { alert('Yanıt boş olamaz!'); return; }
+    try {
+        await db.collection('reviews').doc(currentReviewId).update({ status:'replied', reply:reply });
+        closeModal('reviewModal');
+        await loadReviews(); updateStats();
+        alert('✅ Yorum yanıtlandı ve yayınlandı!');
+    } catch(e) { alert('Hata: '+e.message); }
+}
+
+// ── MODAL / NAV / SIDEBAR ──
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sOverlay').classList.toggle('show');
+}
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sOverlay').classList.remove('show');
+}
+function adminLogout() {
+    if (!confirm('Admin panelden çıkış yapılacak.')) return;
+    auth.signOut().then(function(){ window.location.href='admin-hamit.html'; });
+}
+
+var TITLES = {overview:'Genel Bakış',vn:'Sanal Numara',smm:'Sosyal Medya',balance:'Bakiye Onayları',tickets:'Destek Talepleri',reviews:'Değerlendirmeler',users:'Kullanıcılar'};
+document.querySelectorAll('.nav-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var sec = this.dataset.sec;
+        document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('active');});
+        document.getElementById('sec-'+sec).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        document.getElementById('pageTitle').textContent = TITLES[sec]||sec;
+        closeSidebar();
+    });
+});
+
+// ── SAAT ──
+setInterval(function(){
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+},1000);
+</script>
+
+</body>
+</html>

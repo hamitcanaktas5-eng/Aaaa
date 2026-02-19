@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    
+    <style>html.auth-loading body{opacity:0!important;pointer-events:none!important}</style>
+    <script>document.documentElement.classList.add('auth-loading');</script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Değerlendirmeler - Roxy Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="reviews-style.css">
+    <link rel="stylesheet" href="roxy-alerts.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon"><img src="roxy-logo.svg" alt="Roxy" style="width:28px;height:28px;"></div>
+                <div class="logo-text">
+                    <span class="logo-main">ROXY</span>
+                    <span class="logo-sub">STORE</span>
+                </div>
+            </div>
+            <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i><span>Ana Sayfa</span></a>
+            <a href="virtual-number.html" class="nav-item"><i class="fas fa-mobile-alt"></i><span>Sanal Numara</span></a>
+            <a href="social-media.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Sosyal Medya</span></a>
+            <a href="balance.html" class="nav-item"><i class="fas fa-wallet"></i><span>Bakiye Ekle</span></a>
+            <a href="reviews.html" class="nav-item active"><i class="fas fa-star"></i><span>Değerlendirmeler</span></a>
+            <div class="nav-divider"></div>
+            <a href="support.html" class="nav-item nav-support"><i class="fas fa-headset"></i><span>Destek</span></a>
+        </nav>
+</div>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ANA İÇERİK -->
+    <div class="main-content">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="topbar-logo">
+                    <span class="logo-main">ROXY</span>
+                    <span class="logo-sub">STORE</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="user-balance" onclick="window.location.href='balance.html'" style="cursor:pointer;" title="Bakiye Ekle">
+                    <i class="fas fa-wallet"></i>
+                    <div>
+                        <span class="balance-label">Mevcut Bakiye</span>
+                        <span class="balance-amount">₺0.00</span>
+                    </div>
+                </div>
+                <div class="user-avatar" onclick="window.location.href='profile.html'" style="cursor:pointer;">
+                    <img src="https://ui-avatars.com/api/?name=User&background=00D9FF&color=fff" alt="User">
+                    <span>Kullanıcı</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANA SAYFA -->
+        <div class="container" id="mainView">
+
+            <div class="page-header">
+                <h1><i class="fas fa-star"></i> Değerlendirmeler</h1>
+                <p>Hizmetlerimizi değerlendirin ve yorumları görüntüleyin</p>
+            </div>
+
+            <!-- YORUMLARIM BUTONU -->
+            <button class="btn-my-reviews" onclick="showMyReviews()">
+                <div class="btn-my-reviews-left">
+                    <div class="btn-icon"><i class="fas fa-user-circle"></i></div>
+                    <div>
+                        <span class="btn-title">Yorumlarım ve Yanıtlarım</span>
+                        <span class="btn-sub">E-posta ile sorgula</span>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- YORUM GÖNDER -->
+            <div class="form-card">
+                <h3 class="form-title"><i class="fas fa-pen"></i> Değerlendirme Gönder</h3>
+
+                <div class="field-group">
+                    <label class="field-label">Puanınız</label>
+                    <div class="star-rating" id="starRating">
+                        <i class="fas fa-star star" data-value="1" onclick="setRating(1)"></i>
+                        <i class="fas fa-star star" data-value="2" onclick="setRating(2)"></i>
+                        <i class="fas fa-star star" data-value="3" onclick="setRating(3)"></i>
+                        <i class="fas fa-star star" data-value="4" onclick="setRating(4)"></i>
+                        <i class="fas fa-star star" data-value="5" onclick="setRating(5)"></i>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Yorumunuz</label>
+                    <textarea class="text-area" id="reviewText" placeholder="Deneyiminizi paylaşın..." rows="4" oninput="checkReviewForm()"></textarea>
+                </div>
+
+                <div class="pending-info">
+                    <i class="fas fa-clock"></i>
+                    <p>Yorumunuz ekibimiz tarafından incelendikten sonra yayınlanacaktır.</p>
+                </div>
+
+                <button class="btn-submit" id="btnSubmitReview" onclick="submitReview()" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                    Gönder
+                </button>
+            </div>
+
+            <!-- SON YORUMLAR -->
+            <div class="latest-section">
+                <div class="latest-header">
+                    <h3><i class="fas fa-comments"></i> Son Değerlendirmeler</h3>
+                </div>
+
+                <div class="reviews-list" id="latestReviews">
+                    <!-- JS ile doldurulacak -->
+                </div>
+
+                <button class="btn-all-reviews" onclick="showAllReviews()">
+                    <i class="fas fa-list"></i>
+                    Tüm Yorumları Görüntüle
+                </button>
+            </div>
+
+        </div>
+
+        <!-- YORUMLARIM EKRANI -->
+        <div class="container" id="myReviewsView" style="display:none;">
+
+            <div class="back-header">
+                <button class="btn-back" onclick="showMain()">
+                    <i class="fas fa-arrow-left"></i>
+                    Geri
+                </button>
+                <h2>Yorumlarım ve Yanıtlarım</h2>
+            </div>
+
+            <div class="form-card">
+                <h3 class="form-title"><i class="fas fa-search"></i> E-posta ile Sorgula</h3>
+                <div class="field-group">
+                    <label class="field-label">E-posta Adresiniz</label>
+                    <input type="email" class="text-input" id="queryEmail" placeholder="ornek@mail.com" oninput="checkQueryForm()">
+                </div>
+                <button class="btn-submit" id="btnQuery" onclick="queryReviews()" disabled>
+                    <i class="fas fa-search"></i>
+                    Sorgula
+                </button>
+            </div>
+
+            <!-- Sonuçlar -->
+            <div id="queryResults" style="display:none;">
+                <div class="results-header">
+                    <h3>Yorumlarınız</h3>
+                    <span class="results-count" id="resultsCount"></span>
+                </div>
+                <div class="reviews-list" id="myReviewsList"></div>
+            </div>
+
+        </div>
+
+        <!-- TÜM YORUMLAR EKRANI -->
+        <div class="container" id="allReviewsView" style="display:none;">
+
+            <div class="back-header">
+                <button class="btn-back" onclick="showMain()">
+                    <i class="fas fa-arrow-left"></i>
+                    Geri
+                </button>
+                <h2>Tüm Değerlendirmeler</h2>
+            </div>
+
+            <div class="reviews-list" id="allReviewsList"></div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-support">
+                    <p>Destek</p>
+                    <div class="footer-btns">
+                        <a href="https://wa.me/447795203704" target="_blank" class="footer-btn whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                        <a href="https://t.me/roxysatici" target="_blank" class="footer-btn telegram"><i class="fab fa-telegram"></i> Telegram</a>
+                    </div>
+                </div>
+                <p class="footer-copy">&copy; 2026 Roxy Store. Tüm hakları saklıdır.</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="roxy-alerts.js"></script>
+    <script src="reviews-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    
+    <style>html.auth-loading body{opacity:0!important;pointer-events:none!important}</style>
+    <script>document.documentElement.classList.add('auth-loading');</script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakiye Ekle - Roxy Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="balance-style.css">
+    <link rel="stylesheet" href="roxy-alerts.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon"><img src="roxy-logo.svg" alt="Roxy" style="width:28px;height:28px;"></div>
+                <div class="logo-text">
+                    <span class="logo-main">ROXY</span>
+                    <span class="logo-sub">STORE</span>
+                </div>
+            </div>
+            <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i><span>Ana Sayfa</span></a>
+            <a href="virtual-number.html" class="nav-item"><i class="fas fa-mobile-alt"></i><span>Sanal Numara</span></a>
+            <a href="social-media.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Sosyal Medya</span></a>
+            <a href="balance.html" class="nav-item active"><i class="fas fa-wallet"></i><span>Bakiye Ekle</span></a>
+            <a href="reviews.html" class="nav-item"><i class="fas fa-star"></i><span>Değerlendirmeler</span></a>
+            <div class="nav-divider"></div>
+            <a href="support.html" class="nav-item nav-support"><i class="fas fa-headset"></i><span>Destek</span></a>
+        </nav>
+</div>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ANA İÇERİK -->
+    <div class="main-content">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="topbar-logo">
+                    <span class="logo-main">ROXY</span>
+                    <span class="logo-sub">STORE</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="user-balance">
+                    <i class="fas fa-wallet"></i>
+                    <div>
+                        <span class="balance-label">Mevcut Bakiye</span>
+                        <span class="balance-amount">₺0.00</span>
+                    </div>
+                </div>
+                <div class="user-avatar" onclick="window.location.href='profile.html'" style="cursor:pointer;">
+                    <img src="https://ui-avatars.com/api/?name=User&background=00D9FF&color=fff" alt="User">
+                    <span>Kullanıcı</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAYFA İÇERİĞİ -->
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-wallet"></i> Bakiye Ekle</h1>
+                <p>Hesabınıza bakiye yüklemek için yöntem seçin</p>
+            </div>
+
+            <!-- YÖNTEM KARTLARI -->
+            <div class="methods-grid">
+                <div class="method-card maintenance" id="card-payment">
+                    <div class="method-badge maintenance-badge">🔧 Bakımda</div>
+                    <div class="method-icon payment-icon" style="opacity:0.5;">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h3 style="opacity:0.6;">Ödeme Sağlayıcı</h3>
+                    <p>Kart ile ödeme yakında aktif olacaktır</p>
+                    <div class="method-check" id="check-payment"><i class="fas fa-check"></i></div>
+                </div>
+
+                <div class="method-card" onclick="selectMethod('iban')" id="card-iban">
+                    <div class="method-badge manual">Manuel Onay</div>
+                    <div class="method-icon iban-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <h3>Papara Transferi</h3>
+                    <p>IBAN ile havale yaparak bakiye yükleyin</p>
+                    <div class="method-check" id="check-iban"><i class="fas fa-check"></i></div>
+                </div>
+            </div>
+
+            <!-- ÖDEME SAĞLAYICI FORMU -->
+            <div class="method-form" id="form-payment" style="display:none;">
+                <div class="form-card">
+                    <h3 class="form-title"><i class="fas fa-credit-card"></i> Ödeme Sağlayıcı</h3>
+
+                    <div class="field-group">
+                        <label class="field-label">Yüklenecek Tutar</label>
+                        <div class="amount-presets">
+                            <button class="preset-btn" onclick="setPreset(50, this)">₺50</button>
+                            <button class="preset-btn" onclick="setPreset(100, this)">₺100</button>
+                            <button class="preset-btn" onclick="setPreset(250, this)">₺250</button>
+                            <button class="preset-btn" onclick="setPreset(500, this)">₺500</button>
+                        </div>
+                        <div class="input-wrapper">
+                            <span class="input-prefix">₺</span>
+                            <input type="number" id="paymentAmount" class="amount-input" placeholder="0.00" min="10" oninput="onPaymentAmountChange()">
+                        </div>
+                        <p class="field-hint">Minimum yükleme tutarı: <strong>₺10</strong></p>
+                    </div>
+
+                    <div class="total-row">
+                        <span>Ödenecek Tutar</span>
+                        <span class="total-amount" id="paymentTotal">₺0.00</span>
+                    </div>
+
+                    <button class="btn-pay" id="btnPay" onclick="handlePayment()" disabled>
+                        <i class="fas fa-lock"></i>
+                        Güvenli Öde
+                    </button>
+
+                    <p class="secure-note"><i class="fas fa-shield-alt"></i> 256-bit SSL ile korunan güvenli ödeme</p>
+                </div>
+            </div>
+
+            <!-- IBAN FORMU -->
+            <div class="method-form" id="form-iban" style="display:none;">
+                <div class="form-card">
+                    <h3 class="form-title"><i class="fas fa-university"></i> Papara Transferi</h3>
+
+                    <!-- Mesai durumu -->
+                    <div class="schedule-card" id="ibanSchedule">
+                        <div class="schedule-icon" id="ibanScheduleIcon"></div>
+                        <div class="schedule-body">
+                            <h4 id="ibanScheduleTitle"></h4>
+                            <p id="ibanScheduleText"></p>
+                        </div>
+                    </div>
+
+                    <!-- IBAN Bilgileri -->
+                    <div class="iban-details">
+                        <h4 class="details-title">Havale Bilgileri</h4>
+                        <div class="detail-row">
+                            <span class="detail-label">Alıcı</span>
+                            <span class="detail-value">Papara A.Ş.</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">IBAN</span>
+                            <div class="iban-copy-row">
+                                <span class="detail-value" id="ibanNumber">TR93 0082 9000 0949 1708 3191 19</span>
+                                <button class="btn-copy" onclick="copyText('ibanNumber', this)" title="Kopyala">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Ad Soyad</span>
+                            <div class="iban-copy-row">
+                                <span class="detail-value">Y***** T*****</span>
+                                <button class="btn-copy" onclick="copyRealName(this)" title="Kopyala">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="security-note">
+                            <i class="fas fa-lock"></i>
+                            Güvenlik sebebiyle isim maskelenmiştir. Kopyala butonuna basarak tam ismi alabilirsiniz.
+                        </div>
+                    </div>
+
+                    <!-- Tutar -->
+                    <div class="field-group">
+                        <label class="field-label">Yüklediğiniz Tutar</label>
+                        <div class="input-wrapper">
+                            <span class="input-prefix">₺</span>
+                            <input type="number" id="ibanAmount" class="amount-input" placeholder="0.00" min="10" oninput="onIbanAmountChange()">
+                        </div>
+                        <p class="field-hint">Minimum yükleme tutarı: <strong>₺10</strong></p>
+                    </div>
+
+                    <!-- Dekont Yükle -->
+                    <div class="field-group">
+                        <label class="field-label">Dekont Yükle</label>
+                        <div class="upload-area" id="uploadArea" onclick="document.getElementById('receiptFile').click()">
+                            <input type="file" id="receiptFile" accept="image/*,.pdf" onchange="onFileSelect(event)" style="display:none;">
+                            <div class="upload-placeholder" id="uploadPlaceholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Tıklayarak dekont seçin</p>
+                                <span>PNG, JPG veya PDF</span>
+                            </div>
+                            <div class="upload-preview" id="uploadPreview" style="display:none;">
+                                <i class="fas fa-file-check"></i>
+                                <p id="fileName">dosya.jpg</p>
+                                <span>Değiştirmek için tıklayın</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-pay" id="btnIban" onclick="handleIban()" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                        Dekont Gönder
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-support">
+                    <p>Destek</p>
+                    <div class="footer-btns">
+                        <a href="https://wa.me/447795203704" target="_blank" class="footer-btn whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                        <a href="https://t.me/roxysatici" target="_blank" class="footer-btn telegram"><i class="fab fa-telegram"></i> Telegram</a>
+                    </div>
+                </div>
+                <p class="footer-copy">&copy; 2026 Roxy Store. Tüm hakları saklıdır.</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="roxy-alerts.js"></script>
+    <script src="balance-script.js"></script>
+</body>
+</html>

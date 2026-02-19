@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+
+    <style>html.auth-loading body{opacity:0!important;pointer-events:none!important}</style>
+    <script>document.documentElement.classList.add('auth-loading');</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard - Roxy Store</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--primary:#00D9FF;--secondary:#A855F7;--accent:#00FF88;--dark:#0A0A0F;--dark2:#12121A;--dark3:#1A1A28;--border:rgba(0,217,255,.12);--text:#FFF;--muted:#A0A0B8;--error:#FF6584;--warn:#FFB347;}
+body{font-family:'Poppins',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden;}
+@keyframes roxySlideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* SIDEBAR */
+.sidebar{position:fixed;left:-290px;top:0;width:270px;height:100vh;background:rgba(26,26,40,.97);backdrop-filter:blur(20px);border-right:1px solid var(--border);z-index:1000;transition:left .3s;display:flex;flex-direction:column;}
+.sidebar.open{left:0;}
+.sidebar-header{padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#0A0A0F;}
+.logo-main{font-size:22px;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo-sub{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:2px;display:block;}
+.sidebar-close{background:transparent;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:6px;}
+.sidebar-nav{flex:1;overflow-y:auto;padding:12px 0;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:13px 20px;color:var(--muted);text-decoration:none;border-left:3px solid transparent;font-size:14px;font-weight:500;transition:all .2s;}
+.nav-item:hover,.nav-item.active{background:rgba(0,217,255,.07);color:var(--primary);border-left-color:var(--primary);}
+.nav-item i{width:20px;font-size:17px;}
+.nav-divider{height:1px;background:rgba(255,255,255,.06);margin:8px 16px;}
+.nav-item.nav-support{color:var(--primary);font-weight:700;}
+/* OVERLAY */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;opacity:0;visibility:hidden;transition:.3s;}
+.overlay.active{opacity:1;visibility:visible;}
+/* TOPBAR */
+.main-content{min-height:100vh;display:flex;flex-direction:column;}
+.topbar{background:rgba(26,26,40,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.menu-toggle{background:transparent;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:6px;}
+.topbar-logo-text{font-size:18px;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.topbar-logo-sub{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:1.5px;}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+.user-balance{display:flex;align-items:center;gap:10px;padding:9px 14px;background:rgba(0,217,255,.08);border:1.5px solid rgba(0,217,255,.25);border-radius:12px;cursor:pointer;transition:.2s;}
+.user-balance:hover{border-color:var(--primary);}
+.user-balance i{font-size:18px;color:var(--primary);}
+.balance-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;}
+.balance-amount{font-size:15px;font-weight:800;color:var(--primary);}
+.user-avatar{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.user-avatar img{width:38px;height:38px;border-radius:50%;border:2px solid var(--primary);}
+.user-avatar span{font-weight:600;font-size:14px;}
+
+/* PROFILE MENU */
+.profile-wrap{position:relative;}
+.profile-btn{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);padding:6px 10px;border-radius:14px;color:var(--text);cursor:pointer;transition:.2s;font-family:'Poppins',sans-serif}
+.profile-btn:hover{border-color:rgba(0,217,255,.35);background:rgba(0,217,255,.06);}
+.profile-initials{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#0A0A0F;}
+.profile-name{font-weight:700;font-size:14px;}
+.profile-menu{position:absolute;right:0;top:52px;min-width:260px;background:rgba(18,18,26,.98);backdrop-filter:blur(18px);border:1px solid rgba(0,217,255,.14);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.45);padding:10px;display:none;z-index:9999;}
+.profile-menu.open{display:block;animation:roxySlideIn .18s ease;}
+.pm-head{display:flex;gap:12px;align-items:center;padding:10px;}
+.pm-initials{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#0A0A0F;}
+.pm-name{font-weight:900;font-size:14px;}
+.pm-email{font-size:12px;color:var(--muted);margin-top:2px;word-break:break-all;}
+.pm-divider{height:1px;background:rgba(255,255,255,.06);margin:6px 6px;}
+.pm-item{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border:none;background:transparent;color:var(--text);border-radius:12px;cursor:pointer;font-weight:700;font-size:13px;text-align:left;}
+.pm-item:hover{background:rgba(0,217,255,.08);color:var(--primary);}
+.pm-item i{width:18px;color:var(--primary);}
+
+/* CONTENT */
+.container{flex:1;padding:32px 24px 60px;max-width:1200px;margin:0 auto;width:100%;}
+.welcome{margin-bottom:32px;}
+.welcome h1{font-size:32px;font-weight:900;margin-bottom:6px;}
+.welcome p{color:var(--muted);}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:32px;}
+.stat-card{background:var(--dark3);border:1.5px solid var(--border);border-radius:18px;padding:24px;transition:all .2s;}
+.stat-card:hover{border-color:rgba(0,217,255,.3);transform:translateY(-3px);}
+.stat-card.bal{background:linear-gradient(135deg,rgba(0,217,255,.1),rgba(168,85,247,.1));border-color:rgba(0,217,255,.25);}
+.stat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px;}
+.stat-icon.c1{background:rgba(0,217,255,.12);color:var(--primary);}
+.stat-icon.c2{background:rgba(255,101,132,.12);color:#FF6584;}
+.stat-icon.c3{background:rgba(255,179,71,.12);color:var(--warn);}
+.stat-icon.c4{background:rgba(0,255,136,.12);color:var(--accent);}
+.stat-label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px;}
+.stat-value{font-size:28px;font-weight:900;}
+.btn-add-bal{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:linear-gradient(135deg,var(--primary),var(--secondary));border:none;border-radius:10px;color:#0A0A0F;font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:14px;transition:.2s;}
+.btn-add-bal:hover{opacity:.9;transform:translateY(-1px);}
+.sec-title{font-size:22px;font-weight:700;margin-bottom:18px;}
+.quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:32px;}
+.qbtn{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px;background:var(--dark3);border:1.5px solid var(--border);border-radius:16px;color:var(--text);cursor:pointer;font-family:'Poppins',sans-serif;transition:.2s;}
+.qbtn:hover{border-color:var(--primary);background:rgba(0,217,255,.05);transform:translateY(-3px);}
+.qbtn i{font-size:28px;color:var(--primary);}
+.qbtn span{font-weight:600;font-size:14px;}
+.orders-box{background:var(--dark3);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty-state i{font-size:52px;opacity:.3;display:block;margin-bottom:14px;}
+.empty-state h3{font-size:18px;margin-bottom:6px;}
+footer{background:var(--dark3);border-top:1px solid var(--border);padding:24px;margin-top:auto;}
+.foot-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+.foot-links{display:flex;gap:10px;}
+.foot-links a{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;color:#fff;transition:.2s;}
+.foot-links a.wa{background:#25D366;} .foot-links a.tg{background:#0088CC;}
+.foot-links a:hover{opacity:.85;transform:translateY(-1px);}
+.foot-copy{color:var(--muted);font-size:13px;}
+@media(max-width:768px){.user-avatar span,.balance-label{display:none;}.container{padding:20px 14px 50px;}.welcome h1{font-size:24px;}}
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo"><div class="logo-icon"><i class="fas fa-bolt"></i></div><div><span class="logo-main">ROXY</span><span class="logo-sub">STORE</span></div></div>
+        <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item active"><i class="fas fa-home"></i><span>Ana Sayfa</span></a>
+        <a href="virtual-number.html" class="nav-item"><i class="fas fa-mobile-alt"></i><span>Sanal Numara</span></a>
+        <a href="social-media.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Sosyal Medya</span></a>
+        <a href="balance.html" class="nav-item"><i class="fas fa-wallet"></i><span>Bakiye Ekle</span></a>
+        <a href="reviews.html" class="nav-item"><i class="fas fa-star"></i><span>Değerlendirmeler</span></a>
+        <div class="nav-divider"></div>
+        <a href="support.html" class="nav-item nav-support"><i class="fas fa-headset"></i><span>Destek</span></a>
+    </nav>
+</div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="main-content">
+    <div class="topbar">
+        <div class="topbar-left">
+            <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div><span class="topbar-logo-text">ROXY</span> <span class="topbar-logo-sub">STORE</span></div>
+        </div>
+        <div class="topbar-right">
+            <div class="user-balance" onclick="window.location.href='balance.html'" title="Bakiye Ekle">
+                <i class="fas fa-wallet"></i>
+                <div><span class="balance-label">Bakiye</span><span class="balance-amount" id="balanceDisplay">0 ₺</span></div>
+            </div>
+            <div class="profile-wrap" id="profileWrap">
+                <button class="profile-btn" id="profileBtn" type="button" aria-haspopup="true" aria-expanded="false" title="Profil">
+                    <span class="profile-initials" id="profileInitials">U</span>
+                    <span class="profile-name" id="userName">Ad</span>
+                    <i class="fas fa-chevron-down" style="font-size:12px;color:var(--muted)"></i>
+                </button>
+                <div class="profile-menu" id="profileMenu" aria-label="Profil menüsü">
+                    <div class="pm-head">
+                        <div class="pm-initials" id="pmInitials">U</div>
+                        <div class="pm-meta">
+                            <div class="pm-name" id="pmName">Ad</div>
+                            <div class="pm-email" id="pmEmail">—</div>
+                        </div>
+                    </div>
+                    <div class="pm-divider"></div>
+                    <button class="pm-item" type="button" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i> Profil</button>
+                    <button class="pm-item" type="button" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="welcome">
+            <h1 id="welcomeMsg">Hoş Geldiniz! 👋</h1>
+            <p>Hesabınızı yönetin ve hizmetlerimizden yararlanın</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card bal">
+                <div class="stat-icon c1"><i class="fas fa-wallet"></i></div>
+                <span class="stat-label">Mevcut Bakiye</span>
+                <div class="stat-value" id="statBalance">0 ₺</div>
+                <button class="btn-add-bal" onclick="window.location.href='balance.html'"><i class="fas fa-plus"></i> Bakiye Yükle</button>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon c2"><i class="fas fa-box"></i></div>
+                <span class="stat-label">Toplam Sipariş</span>
+                <div class="stat-value" id="statTotal">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon c3"><i class="fas fa-clock"></i></div>
+                <span class="stat-label">Bekleyen</span>
+                <div class="stat-value" id="statPending">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon c4"><i class="fas fa-check-circle"></i></div>
+                <span class="stat-label">Tamamlanan</span>
+                <div class="stat-value" id="statDone">—</div>
+            </div>
+        </div>
+
+        <div class="sec-title">Hızlı İşlemler</div>
+        <div class="quick-actions">
+            <button class="qbtn" onclick="window.location.href='virtual-number.html'"><i class="fas fa-mobile-alt"></i><span>Sanal Numara Al</span></button>
+            <button class="qbtn" onclick="window.location.href='social-media.html'"><i class="fas fa-chart-line"></i><span>SMM Sipariş Ver</span></button>
+            <button class="qbtn" onclick="window.location.href='balance.html'"><i class="fas fa-wallet"></i><span>Bakiye Yükle</span></button>
+        </div>
+
+        <div class="sec-title">Son Siparişler</div>
+        <div class="orders-box" id="ordersBox">
+            <div class="empty-state"><i class="fas fa-box-open"></i><h3>Henüz sipariş yok</h3><p>Hizmetlerimizden yararlanmak için sipariş verebilirsiniz</p></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="foot-inner">
+            <div class="foot-links">
+                <a href="https://wa.me/447795203704" target="_blank" class="wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                <a href="https://t.me/roxysatici" target="_blank" class="tg"><i class="fab fa-telegram"></i> Telegram</a>
+            </div>
+            <span class="foot-copy">© 2026 Roxy Store</span>
+        </div>
+    </footer>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+// ── ROXYUI ──
+var RoxyUI = {
+    toast:function(msg,type,dur){
+        dur=dur||3500;
+        var icons={success:'check-circle',error:'times-circle',warning:'exclamation-triangle',info:'info-circle'};
+        var colors={success:'#00FF88',error:'#FF6584',warning:'#FFB347',info:'#00D9FF'};
+        var c=document.getElementById('_rt');
+        if(!c){c=document.createElement('div');c.id='_rt';c.style.cssText='position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;max-width:360px;';document.body.appendChild(c);}
+        var t=document.createElement('div');
+        t.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 18px;background:#1F1F2E;border:1.5px solid '+(colors[type]||colors.info)+';border-radius:14px;font-family:Poppins,sans-serif;font-size:14px;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,.5);';
+        t.innerHTML='<i class="fas fa-'+(icons[type]||'info-circle')+'" style="color:'+(colors[type]||colors.info)+';flex-shrink:0;font-size:18px"></i><span>'+msg+'</span>';
+        c.appendChild(t);
+        setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='.3s';setTimeout(function(){t.remove();},300);},dur);
+    },
+    confirm:function(title,msg,okL,cancelL,danger){
+        return new Promise(function(resolve){
+            var ov=document.createElement('div');
+            ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;';
+            ov.innerHTML='<div style="background:#1A1A28;border:1.5px solid rgba(0,217,255,.2);border-radius:20px;padding:32px 28px;max-width:420px;width:100%;text-align:center;font-family:Poppins,sans-serif;">'
+                +'<div style="font-size:40px;margin-bottom:12px"><i class="fas fa-question-circle" style="color:#00D9FF"></i></div>'
+                +'<div style="font-size:18px;font-weight:800;margin-bottom:10px;color:#fff">'+title+'</div>'
+                +'<div style="font-size:14px;color:#A0A0B8;line-height:1.7;margin-bottom:24px">'+msg+'</div>'
+                +'<div style="display:flex;gap:12px;justify-content:center;">'
+                +'<button id="_rkC" style="padding:12px 28px;background:transparent;border:1.5px solid rgba(255,255,255,.15);border-radius:12px;color:#A0A0B8;font-weight:700;cursor:pointer;font-family:Poppins,sans-serif;">'+(cancelL||'İptal')+'</button>'
+                +'<button id="_rkO" style="padding:12px 28px;background:'+(danger?'linear-gradient(135deg,#FF6584,#cc3355)':'linear-gradient(135deg,#00D9FF,#A855F7)')+';border:none;border-radius:12px;color:#0A0A0F;font-weight:800;cursor:pointer;font-family:Poppins,sans-serif;">'+(okL||'Onayla')+'</button>'
+                +'</div></div>';
+            document.body.appendChild(ov);
+            ov.querySelector('#_rkO').onclick=function(){ov.remove();resolve(true);};
+            ov.querySelector('#_rkC').onclick=function(){ov.remove();resolve(false);};
+        });
+    },
+    alert:function(title,msg,type){
+        return new Promise(function(resolve){
+            var icons={success:'check-circle',error:'times-circle',warning:'exclamation-triangle',info:'info-circle'};
+            var colors={success:'#00FF88',error:'#FF6584',warning:'#FFB347',info:'#00D9FF'};
+            var ov=document.createElement('div');
+            ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99998;display:flex;align-items:center;justify-content:center;padding:16px;';
+            ov.innerHTML='<div style="background:#1A1A28;border:1.5px solid rgba(0,217,255,.2);border-radius:20px;padding:32px 28px;max-width:420px;width:100%;text-align:center;font-family:Poppins,sans-serif;">'
+                +'<div style="font-size:40px;margin-bottom:12px"><i class="fas fa-'+(icons[type||'info']||'info-circle')+'" style="color:'+(colors[type||'info']||colors.info)+'"></i></div>'
+                +'<div style="font-size:18px;font-weight:800;margin-bottom:10px;color:#fff">'+title+'</div>'
+                +'<div style="font-size:14px;color:#A0A0B8;line-height:1.7;margin-bottom:24px">'+msg+'</div>'
+                +'<button id="_rkOk" style="padding:12px 36px;background:linear-gradient(135deg,#00D9FF,#A855F7);border:none;border-radius:12px;color:#0A0A0F;font-weight:800;font-size:15px;cursor:pointer;font-family:Poppins,sans-serif;">Tamam</button>'
+                +'</div>';
+            document.body.appendChild(ov);
+            ov.querySelector('#_rkOk').onclick=function(){ov.remove();resolve();};
+        });
+    }
+};
+
+// ── SIDEBAR ──
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('active');
+}
+
+function handleLogout(){
+    RoxyUI.confirm('Çıkış Yap','Hesabınızdan çıkış yapmak istiyor musunuz?','Çıkış Yap','İptal',true).then(function(ok){
+        if(ok) auth.signOut().then(function(){ window.location.href='auth.html'; });
+    });
+}
+
+// ── AUTH + VERİ ──
+var _unsub = auth.onAuthStateChanged(function(user){
+    _unsub();
+    if(!user){ window.location.href='auth.html'; return; }
+
+    db.collection('users').doc(user.uid).get().then(function(snap){
+        var data = snap.exists ? snap.data() : {};
+        var name = data.name || user.displayName || 'Kullanıcı';
+        var bal  = data.balance || 0;
+
+        document.getElementById('welcomeMsg').textContent   = 'Hoş Geldin, '+name.split(' ')[0]+'! 👋';
+        document.getElementById('balanceDisplay').textContent = formatPrice(bal);
+        document.getElementById('statBalance').textContent   = formatPrice(bal);
+        setProfileUI(name, user.email);
+        document.getElementById('userName').textContent = name;
+
+        // Siparişleri çek
+        db.collection('orders').where('userId','==',user.uid).get().then(function(snap){
+            var total=snap.size, pending=0, done=0;
+            snap.forEach(function(d){ var s=d.data().status; if(s==='pending'||s==='processing') pending++; if(s==='completed') done++; });
+            document.getElementById('statTotal').textContent   = total;
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statDone').textContent    = done;
+
+            if(snap.empty){ return; }
+            var html='';
+            snap.forEach(function(doc){
+                var o=doc.data();
+                var stMap={pending:['⏳','#FFB347'],processing:['⚙️','#00D9FF'],completed:['✅','#00FF88'],cancelled:['❌','#FF6584']};
+                var st=stMap[o.status]||stMap.pending;
+                html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.04);">'
+                    +'<div><div style="font-size:13px;font-weight:600;color:#00D9FF">'+(o.orderId||'—')+'</div>'
+                    +'<div style="font-size:12px;color:#A0A0B8;margin-top:3px">'+(o.platform||'')+' '+(o.service||o.type||'')+'</div></div>'
+                    +'<div style="text-align:right"><div style="font-weight:700">'+formatPrice(o.price||0)+'</div>'
+                    +'<div style="font-size:12px;color:'+st[1]+';margin-top:3px">'+st[0]+' '+(o.status==='pending'?'Beklemede':o.status==='processing'?'İşleniyor':o.status==='completed'?'Tamamlandı':'İptal')+'</div></div>'
+                    +'</div>';
+            });
+            document.getElementById('ordersBox').innerHTML='<div>'+html+'</div>';
+        }).catch(function(e){ console.error('Siparişler:',e); });
+
+    }).catch(function(e){ console.error('Kullanıcı:',e); });
+});
+
+// ── PROFILE MENU ──
+(function(){
+    var btn = document.getElementById('profileBtn');
+    var menu = document.getElementById('profileMenu');
+    if (!btn || !menu) return;
+
+    function closeMenu(){ menu.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+    function toggleMenu(e){
+        e.stopPropagation();
+        var open = menu.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', toggleMenu);
+    document.addEventListener('click', function(e){
+        if (!document.getElementById('profileWrap').contains(e.target)) closeMenu();
+    });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeMenu(); });
+})();
+
+function setProfileUI(name,email){
+    name = name || 'Kullanıcı';
+    var initials = (name.trim().split(/\s+/).slice(0,2).map(function(p){return p[0]||'';}).join('') || 'U').toUpperCase();
+    var uName = document.getElementById('userName'); if (uName) uName.textContent = name;
+    var pi = document.getElementById('profileInitials'); if (pi) pi.textContent = initials;
+    var pmi = document.getElementById('pmInitials'); if (pmi) pmi.textContent = initials;
+    var pmn = document.getElementById('pmName'); if (pmn) pmn.textContent = name;
+    var pme = document.getElementById('pmEmail'); if (pme) pme.textContent = email || '—';
+}
+
+function logout(){
+    auth.signOut().then(function(){
+        window.location.href = 'auth.html';
+    }).catch(function(e){
+        RoxyUI.toast('Çıkış yapılamadı: ' + e.message, 'error', 4500);
+    });
+}
+
+</script>
+</body>
+</html>

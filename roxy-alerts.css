@@ -1,0 +1,122 @@
+/* ─── ROXY ALERTS ─── */
+.roxy-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    animation: overlayIn 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+@keyframes overlayIn { from { opacity:0; } to { opacity:1; } }
+
+.roxy-modal {
+    background: #1F1F2E;
+    border: 2px solid rgba(0,217,255,0.25);
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 420px; width: 100%;
+    animation: modalIn 0.3s ease;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 60px rgba(0,217,255,0.1);
+}
+@keyframes modalIn { from { opacity:0; transform: scale(0.92) translateY(20px); } to { opacity:1; transform: scale(1) translateY(0); } }
+
+.roxy-modal-icon {
+    width: 56px; height: 56px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; margin-bottom: 18px;
+}
+.roxy-modal-icon.success { background: rgba(0,255,136,0.15); color: #00FF88; }
+.roxy-modal-icon.error   { background: rgba(255,101,132,0.15); color: #FF6584; }
+.roxy-modal-icon.warning { background: rgba(255,184,0,0.15); color: #FFB800; }
+.roxy-modal-icon.info    { background: rgba(0,217,255,0.15); color: #00D9FF; }
+.roxy-modal-icon.confirm { background: rgba(168,85,247,0.15); color: #A855F7; }
+
+.roxy-modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 10px;
+}
+.roxy-modal-message {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px; color: #A0A0B8; line-height: 1.7; margin-bottom: 24px;
+}
+
+.roxy-modal-buttons { display: flex; gap: 12px; }
+.roxy-modal-btn {
+    flex: 1; padding: 13px;
+    border-radius: 12px; border: none;
+    font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 14px;
+    cursor: pointer; transition: all 0.3s;
+}
+.roxy-modal-btn.primary {
+    background: linear-gradient(135deg, #00D9FF, #A855F7);
+    color: #0A0A0F;
+}
+.roxy-modal-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,217,255,0.4); }
+.roxy-modal-btn.secondary {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,255,255,0.1);
+    color: #A0A0B8;
+}
+.roxy-modal-btn.secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.roxy-modal-btn.danger {
+    background: rgba(255,101,132,0.15);
+    border: 2px solid rgba(255,101,132,0.3);
+    color: #FF6584;
+}
+.roxy-modal-btn.danger:hover { background: rgba(255,101,132,0.25); transform: translateY(-2px); }
+
+/* ─── TOAST ─── */
+.roxy-toast-container {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 99998;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    pointer-events: none;
+}
+.roxy-toast {
+    display: flex; align-items: center; gap: 10px;
+    padding: 13px 22px;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600;
+    white-space: nowrap; pointer-events: all;
+    animation: toastIn 0.35s ease;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+@keyframes toastIn { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: translateY(0); } }
+.roxy-toast.success { background: linear-gradient(135deg, #00D9FF, #A855F7); color: #0A0A0F; }
+.roxy-toast.error   { background: linear-gradient(135deg, #FF6584, #FF4458); color: #fff; }
+.roxy-toast.warning { background: linear-gradient(135deg, #FFB800, #FF7800); color: #0A0A0F; }
+.roxy-toast.info    { background: rgba(0,217,255,0.15); border: 1px solid rgba(0,217,255,0.3); color: #00D9FF; }
+
+/* ═══════════════════════════════════
+   GLOBAL LAYOUT FIXES (tüm sayfalar)
+════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+body { overflow-x: hidden !important; }
+
+/* Sidebar footer her zaman görünsün */
+.sidebar { overflow: hidden !important; display: flex !important; flex-direction: column !important; }
+.sidebar-nav { flex: 1 !important; min-height: 0 !important; overflow-y: auto !important; }
+.sidebar-footer {
+    flex-shrink: 0 !important;
+    padding: 14px !important;
+    overflow: hidden !important;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.btn-support, .btn-support-nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 13px 8px !important;
+    font-size: 14px !important;
+    overflow: hidden !important;
+}
+
+/* Bakiye butonu hover */
+.user-balance { cursor: pointer; transition: all 0.2s; }
+.user-balance:hover { border-color: var(--primary, #00D9FF) !important; transform: translateY(-1px); }

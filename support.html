@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    
+    <style>html.auth-loading body{opacity:0!important;pointer-events:none!important}</style>
+    <script>document.documentElement.classList.add('auth-loading');</script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destek - Roxy Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="support-style.css">
+    <link rel="stylesheet" href="roxy-alerts.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon"><img src="roxy-logo.svg" alt="Roxy" style="width:28px;height:28px;"></div>
+                <div class="logo-text">
+                    <span class="logo-main">ROXY</span>
+                    <span class="logo-sub">STORE</span>
+                </div>
+            </div>
+            <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i><span>Ana Sayfa</span></a>
+            <a href="virtual-number.html" class="nav-item"><i class="fas fa-mobile-alt"></i><span>Sanal Numara</span></a>
+            <a href="social-media.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Sosyal Medya</span></a>
+            <a href="balance.html" class="nav-item"><i class="fas fa-wallet"></i><span>Bakiye Ekle</span></a>
+            <a href="reviews.html" class="nav-item"><i class="fas fa-star"></i><span>Değerlendirmeler</span></a>
+            <div class="nav-divider"></div>
+            <a href="support.html" class="nav-item nav-support"><i class="fas fa-headset"></i><span>Destek</span></a>
+        </nav>
+</div>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ANA İÇERİK -->
+    <div class="main-content">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="topbar-logo">
+                    <span class="logo-main">ROXY</span>
+                    <span class="logo-sub">STORE</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="user-balance" onclick="window.location.href='balance.html'" style="cursor:pointer;" title="Bakiye Ekle">
+                    <i class="fas fa-wallet"></i>
+                    <div>
+                        <span class="balance-label">Mevcut Bakiye</span>
+                        <span class="balance-amount">₺0.00</span>
+                    </div>
+                </div>
+                <div class="user-avatar" onclick="window.location.href='profile.html'" style="cursor:pointer;">
+                    <img src="https://ui-avatars.com/api/?name=User&background=00D9FF&color=fff" alt="User">
+                    <span>Kullanıcı</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── ANA EKRAN ─── -->
+        <div class="container" id="mainView">
+            <div class="page-header">
+                <h1><i class="fas fa-headset"></i> Destek</h1>
+                <p>Destek taleplerinizi buradan yönetin</p>
+            </div>
+
+            <!-- YENİ TALEP -->
+            <button class="btn-new-ticket" onclick="showNewTicket()">
+                <div class="btn-new-left">
+                    <div class="new-icon"><i class="fas fa-plus"></i></div>
+                    <div>
+                        <span class="btn-new-title">Yeni Talep Oluştur</span>
+                        <span class="btn-new-sub">Destek ekibimizle iletişime geçin</span>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- TALEPLERİM -->
+            <div class="tickets-header">
+                <h3><i class="fas fa-list-alt"></i> Taleplerim</h3>
+                <span class="ticket-count" id="ticketCount">0 talep</span>
+            </div>
+            <div id="ticketsList"></div>
+        </div>
+
+        <!-- ─── YENİ TALEP EKRANI ─── -->
+        <div class="container" id="newTicketView" style="display:none;">
+            <div class="back-header">
+                <button class="btn-back" onclick="showMain()"><i class="fas fa-arrow-left"></i></button>
+                <h2>Yeni Talep Oluştur</h2>
+            </div>
+
+            <div class="form-card">
+                <div class="field-group">
+                    <label class="field-label"><i class="fas fa-tag"></i> Talep Başlığı</label>
+                    <input type="text" class="text-input" id="ticketTitle"
+                        placeholder="Talebinizin başlığını yazın..."
+                        oninput="checkTicketForm()" maxlength="100">
+                    <span class="char-count" id="titleCount">0/100</span>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label"><i class="fas fa-align-left"></i> Talep İçeriği</label>
+                    <textarea class="text-area" id="ticketContent"
+                        placeholder="Sorununuzu detaylı olarak açıklayın..."
+                        rows="6" oninput="checkTicketForm()" maxlength="1000"></textarea>
+                    <span class="char-count" id="contentCount">0/1000</span>
+                </div>
+
+                <div class="response-info">
+                    <i class="fas fa-clock"></i>
+                    <p>Mesai saatleri: <strong>Hafta içi 17:00–00:00</strong> | <strong>Hafta sonu 7/24</strong></p>
+                </div>
+
+                <button class="btn-submit" id="btnSubmitTicket" onclick="submitTicket()" disabled>
+                    <i class="fas fa-paper-plane"></i> Talebi Gönder
+                </button>
+            </div>
+        </div>
+
+        <!-- ─── CHAT EKRANI ─── -->
+        <div id="chatView" style="display:none;" class="chat-wrapper">
+
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <button class="btn-back" onclick="showMain()"><i class="fas fa-arrow-left"></i></button>
+                <div class="chat-header-info">
+                    <h3 id="chatTitle">Talep Başlığı</h3>
+                    <span class="chat-ticket-id" id="chatTicketId">TKT-000</span>
+                </div>
+                <span class="chat-status-badge" id="chatStatusBadge"></span>
+            </div>
+
+            <!-- Mesajlar -->
+            <div class="chat-messages" id="chatMessages"></div>
+
+            <!-- Input -->
+            <div class="chat-input-area">
+                <div class="chat-input-wrap" id="chatInputWrap">
+                    <textarea class="chat-input" id="chatInput"
+                        placeholder="Mesajınızı yazın..."
+                        rows="1"
+                        oninput="autoResize(this)"></textarea>
+                    <button class="chat-send-btn" id="chatSendBtn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="chat-closed-notice" id="chatClosedNotice" style="display:none;">
+                    <i class="fas fa-lock"></i>
+                    Bu talep kapatılmıştır.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footer" id="mainFooter">
+            <div class="footer-inner">
+                <div class="footer-support">
+                    <p>Doğrudan İletişim</p>
+                    <div class="footer-btns">
+                        <a href="https://wa.me/447795203704" target="_blank" class="footer-btn whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                        <a href="https://t.me/roxysatici" target="_blank" class="footer-btn telegram"><i class="fab fa-telegram"></i> Telegram</a>
+                    </div>
+                </div>
+                <p class="footer-copy">&copy; 2026 Roxy Store. Tüm hakları saklıdır.</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="ticket-id.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="roxy-alerts.js"></script>
+    <script src="support-script.js"></script>
+</body>
+</html>
